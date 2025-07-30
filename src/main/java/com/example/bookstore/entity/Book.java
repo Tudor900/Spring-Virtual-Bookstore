@@ -1,5 +1,6 @@
 package com.example.bookstore.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -14,19 +15,19 @@ public class Book {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long bookID;
-    @Getter @Setter
-    String title;
-    @Getter @Setter
+    private String title;
     private Long isbn;
 
     @ManyToOne
     @JoinColumn(name = "author_id")
     @Getter
+    @JsonBackReference("authorRef")
     private Author author;
 
     @ManyToOne
     @JoinColumn(name = "genre_id")
     @Getter
+    @JsonBackReference("bookRef")
     private Genre genre;
 
 

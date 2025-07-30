@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Add New Book</title>
+    <style>
+        body { font-family: sans-serif; margin: 20px; }
+        form { background-color: #f4f4f4; padding: 20px; border-radius: 8px; max-width: 400px; margin: auto; }
+        label { display: block; margin-bottom: 5px; font-weight: bold; }
+        input[type="text"] { width: calc(100% - 22px); padding: 10px; margin-bottom: 15px; border: 1px solid #ddd; border-radius: 4px; }
+        button { background-color: #007bff; color: white; padding: 10px 15px; border: none; border-radius: 4px; cursor: pointer; font-size: 16px; }
+        button:hover { background-color: #0056b3; }
+    </style>
+</head>
+<body>
+
+<h2 style="text-align: center;">Add New Book</h2>
+
+<form action="#" th:action="@{/savebook}" th:object="${book}" method="post">
+    <label for="titleInput">Title:</label>
+    <input type="text" id="titleInput" th:field="*{title}" placeholder="Book Title">
+    <br>
+
+    <label for="isbnInput">ISBN:</label>
+    <input type="text" id="isbnInput" th:field="*{isbn}" placeholder="Book ISBN">
+    <br>
+
+    <label for="authorIdInput">Author ID:</label>
+    <input type="text" id="authorIdInput" th:field="*{author.authorID}" placeholder="Existing Author ID">
+    <br>
+
+    <label for="genreIdInput">Genre ID:</label>
+    <input type="text" id="genreIdInput" th:field="*{genre.genreId}" placeholder="Existing Genre ID">
+    <br>
+
+    <button type="submit">Add Book</button>
+</form>
+
+</body>
+</html>

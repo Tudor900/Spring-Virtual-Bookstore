@@ -1,5 +1,7 @@
 package com.example.bookstore.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -19,26 +21,12 @@ public class Author {
     private Long authorID;
     private String firstname;
     private String lastname;
-    @Getter @Setter
     private String nationality;
-
-    public String getName(){
-        return firstname+" " +lastname;
-    }
-
-
-
-    public void setName(String firstname, String lastname){
-        this.firstname = firstname;
-        this.lastname = lastname;
-    }
-
-
-
 
 
 
     @OneToMany(mappedBy = "author", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference("authorRef")
     private List<Book> book_list = new ArrayList<>();
 
 
