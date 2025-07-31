@@ -9,6 +9,8 @@ import java.security.MessageDigest;
 import java.security.SecureRandom;
 import java.util.List;
 import java.util.Objects;
+import java.util.UUID;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -23,12 +25,51 @@ public class CustomerServiceImplementation implements CustomerService{
 
     @Override
     public Customer saveCustomer(Customer customer) {
+        customer.setAdmin(false);
+        customer.setUniqueID(UUID.randomUUID().toString());
+
+        String encodedPassword = passwordEncoder.encode(customer.getPassword());
+        customer.setPassword(encodedPassword);
+
+        return customerRepository.save(customer);
+    }
+
+    @Override
+    public Customer getCustomer(Customer customer){
+        return customerRepository.findByEmail(customer.getEmail()).orElseThrow(() -> new RuntimeException("Customer not found"));
+    }
+//
+//
+//    FIND BY + OR ELSE THROW WILL BE CHANGED SO THAT THE WEBPAGE
+//    WON'T THROW A /ERROR PAGE WHEN RUNTIMEEXCEPTION HIT
+//
+//
+//
+
+    @Override
+    public Boolean checkForCustomer(Customer customer){
+        Customer selectCustomer = customerRepository.findByEmail(customer.getEmail()).orElseThrow(() -> new RuntimeException("Customer not found"));
+
+        String givenPassword = customer.getPassword();
+
+        return passwordEncoder.matches(givenPassword, selectCustomer.getPassword());
+
+    }
+
+    @Override
+    public Boolean checkForCustomerByUniqueId(String uniqueID){
 
 
-       String encodedPassword = passwordEncoder.encode(customer.getPassword());
-       customer.setPassword(encodedPassword);
+        return customerRepository.findByUniqueID(uniqueID).isPresent();
 
-       return customerRepository.save(customer);
+    }
+
+    @Override
+    public Boolean checkForAdmin(String uniqueID){
+        System.out.println(uniqueID);
+        Customer customer = customerRepository.findByUniqueID(uniqueID).orElseThrow(() -> new RuntimeException("Customer not found"));
+
+        return customer.isAdmin();
     }
 
     // Read operation

@@ -11,5 +11,13 @@ public interface CustomerService {
 
     Customer updateCustomer(Customer customer, Long customerID);
 
+    Boolean checkForCustomer(Customer customer);
+
+    Boolean checkForCustomerByUniqueId(String uniqueID);
+
+    Customer getCustomer(Customer customer);
+
+    Boolean checkForAdmin(String uniqueID);
+
     void deleteCustomerById(Long customerID);
 }

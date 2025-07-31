@@ -27,4 +27,8 @@ public class Customer {
     private String address;
     @CreationTimestamp
     private Instant createdOn;
+    @Column(name = "is_admin", nullable = false)
+    private boolean isAdmin = false;
+    @Column(name = "UNIQUEID")
+    private String uniqueID ;
 }

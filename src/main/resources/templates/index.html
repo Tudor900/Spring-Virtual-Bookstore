@@ -64,34 +64,14 @@
             background-color: #0056b3;
             border-color: #0056b3;
         }
-        .message-container {
-            text-align: center;
-            margin-bottom: 20px;
-        }
-        .message-success {
-            background-color: #d4edda;
-            color: #155724;
-            border: 1px solid #c3e6cb;
-            padding: 10px;
-            border-radius: 5px;
-        }
-        .message-error {
-            background-color: #f8d7da;
-            color: #721c24;
-            border: 1px solid #f5c6cb;
-            padding: 10px;
-            border-radius: 5px;
-        }
+
     </style>
 </head>
 <body>
 
 <h2 style="text-align: center;">The List of Books</h2>
 
-<!-- Display flash messages if any -->
-<div th:if="${message}" class="message-container">
-    <p th:classappend="${messageType == 'success' ? 'message-success' : 'message-error'}" th:text="${message}"></p>
-</div>
+
 
 <table>
     <thead>
@@ -112,8 +92,15 @@
 
 <div class="add-book-container">
     <!-- Changed <button> to <a> and used th:href for navigation -->
-    <a th:href="@{/addBook}" class="btn btn-primary">Add Book</a>
+    <a th:if="${isLoggedIn and isAdmin}" th:href="@{/addBook}" class="btn btn-primary">Add Book</a>
+    <a th:if="${!isLoggedIn}" th:href="@{/login}" class="btn btn-primary">Login</a>
+    <a th:if="${!isLoggedIn}" th:href="@{/createaccount}" class="btn btn-primary">Register</a>
+
+    <form action="#" th:action="@{/logout}" method="post" th:if="${isLoggedIn}" >
+    <button type="submit" class="btn btn-primary">Logout</button>
+    </form>
 </div>
+
 
 </body>
 </html>
