@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <title>Bookstore - Checkout</title>
+  <style>
+    body {
+        font-family: sans-serif;
+        margin: 20px;
+        background-color: #f8f9fa;
+        color: #343a40;
+    }
+    h2 {
+        text-align: center;
+        color: #007bff;
+        margin-bottom: 25px;
+    }
+    table {
+        width: 80%;
+        margin: 20px auto;
+        border-collapse: collapse;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        background-color: #fff;
+        border-radius: 8px;
+        overflow: hidden;
+    }
+    th, td {
+        padding: 12px 15px;
+        text-align: left;
+        border-bottom: 1px solid #dee2e6;
+    }
+    th {
+        background-color: #007bff;
+        color: white;
+        font-weight: bold;
+    }
+    tr:nth-child(even) {
+        background-color: #f2f2f2;
+    }
+    tr:hover {
+        background-color: #e9ecef;
+    }
+    .action-container {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    .btn {
+        display: inline-block;
+        padding: 10px 20px;
+        font-size: 16px;
+        font-weight: bold;
+        text-align: center;
+        text-decoration: none;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+    }
+    .btn-primary {
+        background-color: #007bff;
+        color: white;
+        border: 1px solid #007bff;
+    }
+    .btn-primary:hover {
+        background-color: #0056b3;
+        border-color: #0056b3;
+    }
+    .btn-danger {
+        background-color: #dc3545;
+        color: white;
+        border: 1px solid #dc3545;
+    }
+    .btn-danger:hover {
+        background-color: #c82333;
+        border-color: #bd2130;
+    }
+  </style>
+</head>
+<body>
+
+<h2 style="text-align: center;">Your Shopping Cart</h2>
+
+<table>
+  <thead>
+  <tr>
+    <th>Title</th>
+    <th>ISBN</th>
+    <th>Author</th>
+    <th>Current Quantity</th>
+    <th>Change Quantity</th>
+    <th>Actions</th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr th:each="book:${cartBooks}">
+    <td th:text="${book.title}"></td>
+    <td th:text="${book.isbn}"></td>
+    <td th:text="${book.author.firstname} + ' ' + ${book.author.lastname}"></td>
+    <td th:text="${cartItems.get(T(java.lang.String).valueOf(book.bookID))}"></td>
+    <td>
+      <input type="number"
+             class="quantity-input"
+             th:data-book-id="${book.bookID}"
+             min="1"
+             size="1"
+             th:value="${cartItems.get(T(java.lang.String).valueOf(book.bookID))}">
+    </td>
+    <td>
+      <button class="btn btn-danger btn-sm remove-item" th:data-book-id="${book.bookID}">Remove</button>
+    </td>
+  </tr>
+  </tbody>
+</table>
+
+<div class="action-container" style="justify-content: center; margin-top: 20px;">
+  <a th:href="@{/useraccount}" class="btn btn-primary">Back to User Account</a>
+  <button id="update-checkout-btn" class="btn btn-primary">Update Checkout</button>
+</div>
+
+<table>
+  <thead>
+  <tr>
+    <th>First Name</th>
+    <th>Last Name</th>
+    <th>Address</th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr>
+    <td th:text="${customer.firstname}"></td>
+    <td th:text="${customer.lastname}"></td>
+    <td th:text="${customer.address}"></td>
+  </tr>
+  </tbody>
+</table>
+
+<form th:action="@{/placeOrder}" method="post">
+
+  <!-- Use a th:each loop to create inputs for each book in the cart -->
+  <div th:each="book, status : ${cartBooks}" class="form-item">
+    <h4 th:text="'Book: ' + ${book.title}">Book: Example Title</h4>
+
+    <!-- Input for bookID -->
+    <label th:for="'bookId_' + ${status.index}">Book ID</label>
+    <input type="text"
+           th:id="'bookId_' + ${status.index}"
+           th:name="'orderItems[' + ${status.index} + '].bookID'"
+           th:value="${book.bookID}"
+           readonly>
+
+    <!-- Input for quantity -->
+    <label th:for="'quantity_' + ${status.index}">Quantity</label>
+    <input type="text"
+           th:id="'quantity_' + ${status.index}"
+           th:name="'orderItems[' + ${status.index} + '].quantity'"
+           th:value="${cartItems.get(T(java.lang.String).valueOf(book.bookID))}"
+           readonly>
+  </div>
+
+  <div style="margin-top: 20px; text-align: center;">
+    <button type="submit" class="btn btn-primary">Place Order</button>
+  </div>
+
+</form>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+      const updateCheckoutBtn = document.getElementById('update-checkout-btn');
+      const quantityInputs = document.querySelectorAll('.quantity-input');
+      const removeButtons = document.querySelectorAll('.remove-item');
+
+      function getCookie(name) {
+          const value = `; ${document.cookie}`;
+          const parts = value.split(`; ${name}=`);
+          if (parts.length === 2) {
+              return decodeURIComponent(parts.pop().split(';').shift());
+          }
+      }
+
+      function setCookie(name, value, days) {
+          let expires = "";
+          if (days) {
+              const date = new Date();
+              date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+              expires = "; expires=" + date.toUTCString();
+          }
+          document.cookie = name + "=" + (encodeURIComponent(value) || "")  + expires + "; path=/";
+      }
+
+      function updateCartCookie(bookId, newQuantity) {
+          let cart = {};
+          const cookieValue = getCookie('shoppingCart');
+          if (cookieValue) {
+              cart = JSON.parse(cookieValue);
+          }
+
+          if (newQuantity > 0) {
+              cart[bookId] = newQuantity;
+          } else {
+              delete cart[bookId];
+          }
+
+          setCookie('shoppingCart', JSON.stringify(cart), 3650);
+      }
+
+      quantityInputs.forEach(input => {
+          input.addEventListener('change', (event) => {
+              const bookId = event.target.dataset.bookId;
+              const newQuantity = parseInt(event.target.value);
+              if (newQuantity >= 1) {
+                  updateCartCookie(bookId, newQuantity);
+                  console.log(`Updated quantity for book ${bookId} to ${newQuantity}`);
+              }
+          });
+      });
+
+      removeButtons.forEach(button => {
+          button.addEventListener('click', (event) => {
+              const bookId = event.target.dataset.bookId;
+              updateCartCookie(bookId, 0); // Quantity 0 signals removal
+
+              const row = event.target.closest('tr');
+              if (row) {
+                  row.remove();
+              }
+              console.log(`Removed book ${bookId} from cart.`);
+          });
+      });
+
+      updateCheckoutBtn.addEventListener('click', () => {
+          window.location.reload();
+      });
+  });
+</script>
+
+</body>
+</html>

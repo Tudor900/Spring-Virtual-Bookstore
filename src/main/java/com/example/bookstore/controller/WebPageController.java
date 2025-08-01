@@ -3,6 +3,7 @@ package com.example.bookstore.controller;
 import com.example.bookstore.entity.Author;
 import com.example.bookstore.entity.Customer;
 import com.example.bookstore.entity.Genre;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -19,9 +20,8 @@ import com.example.bookstore.service.AuthorService;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
+import java.util.stream.Collectors;
 
 
 @Controller
@@ -179,7 +179,50 @@ public class WebPageController {
         return "redirect:/useraccount";
     }
 
+//    @PostMapping("/addbooktocart")
+//    public String addBookToCart(@CookieValue(name="userId", required = true)String userId,@RequestParam Map<Long, Long> formData,HttpServletResponse response)
+//    {
+//
+//    }
 
+
+    @GetMapping("/checkout")
+    public String showCart(@CookieValue(name = "shoppingCart", required = false) String shoppingCartCookie, Model model, @CookieValue(name="userId") String userId) {
+        List cartBooks = Collections.emptyList();
+
+        if (shoppingCartCookie != null && !shoppingCartCookie.isEmpty()) {
+            try {
+                // Use Jackson's ObjectMapper to parse the JSON string from the cookie
+                ObjectMapper objectMapper = new ObjectMapper();
+                Map<String, Integer> cartItems = objectMapper.readValue(shoppingCartCookie, Map.class);
+
+                // Extract the book IDs from the map's keys and convert to a List of Long
+                List<Long> bookIds = cartItems.keySet().stream()
+                        .map(Long::valueOf)
+                        .collect(Collectors.toList());
+
+                // Call the service method with the list of IDs
+                cartBooks = bookService.findByBookIDIn(bookIds);
+
+                // Add the cart quantities to the model if needed (optional)
+                model.addAttribute("cartItems", cartItems);
+                System.out.println(cartItems);
+
+            } catch (Exception e) {
+                // Handle parsing errors, e.g., malformed cookie data
+                e.printStackTrace();
+            }
+        }
+        System.out.println(cartBooks);
+
+        model.addAttribute("cartBooks", cartBooks);
+
+        Customer customer = customerService.getCustomerByUniqueId(userId);
+
+        model.addAttribute("customer", customer);
+
+        return "checkout";
+    }
 
 
 

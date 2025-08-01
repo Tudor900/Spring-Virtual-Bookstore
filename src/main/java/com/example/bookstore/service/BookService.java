@@ -12,4 +12,6 @@ public interface BookService {
     Book updateBook(Book book, Long bookID);
 
     void deleteBookById(Long bookID);
+
+    List findByBookIDIn(List <Long> bookIDs);
 }

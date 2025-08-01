@@ -22,12 +22,14 @@ public class Book {
     @JoinColumn(name = "author_id")
     @Getter
     @JsonBackReference("authorRef")
+    @ToString.Exclude
     private Author author;
 
     @ManyToOne
     @JoinColumn(name = "genre_id")
     @Getter
     @JsonBackReference("bookRef")
+    @ToString.Exclude
     private Genre genre;
 
 

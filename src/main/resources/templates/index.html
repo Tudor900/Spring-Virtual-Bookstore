@@ -66,10 +66,14 @@
         }
 
     </style>
+
+
 </head>
 <body>
 
 <h2 style="text-align: center;">The List of Books</h2>
+
+<a th:if="${isLoggedIn}" th:href="@{/checkout}" class="btn btn-primary">Go to Checkout</a>
 
 
 
@@ -79,6 +83,7 @@
         <th>Title</th>
         <th>ISBN</th>
         <th>Author</th>
+        <th></th>
     </tr>
     </thead>
     <tbody>
@@ -86,6 +91,13 @@
         <td th:text="${book.title}"></td>
         <td th:text="${book.isbn}"></td>
         <td th:text="${book.author.firstname} + ' ' + ${book.author.lastname}"></td>
+        <td th:if="${isLoggedIn}">
+            <form class="add-to-cart-form">
+                <button type="submit" class="btn btn-primary">Add to Cart</button>
+                <input type="number" value="1" size="1" min="1" max="9" class="quant-input">
+                <input type="hidden" class="book-id-input" th:value="${book.bookID}">
+            </form>
+        </td>
     </tr>
     </tbody>
 </table>
@@ -106,6 +118,65 @@
     </form>
 </div>
 
+<script>
 
+    document.addEventListener('DOMContentLoaded', function() {
+
+    function getCookie(name) {
+        const value = `; ${document.cookie}`;
+        const parts = value.split(`; ${name}=`);
+        if (parts.length === 2) {
+            // Decode the cookie value when reading it
+            return decodeURIComponent(parts.pop().split(';').shift());
+        }
+    }
+
+    function setCookie(name, value, days) {
+        let expires = "";
+        if (days) {
+            const date = new Date();
+            date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+            expires = "; expires=" + date.toUTCString();
+        }
+        // Encode the cookie value before setting it
+        document.cookie = name + "=" + (encodeURIComponent(value) || "")  + expires + "; path=/";
+    }
+
+    const forms = document.querySelectorAll('.add-to-cart-form');
+
+    forms.forEach(form => {
+        form.addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            const bookId = form.querySelector('.book-id-input').value;
+            const quantity = parseInt(form.querySelector('.quant-input').value);
+
+            if (!bookId || isNaN(quantity) || quantity < 1) {
+                return;
+            }
+
+            const cookieValue = getCookie('shoppingCart');
+            let cart = {};
+
+            if (cookieValue) {
+                cart = JSON.parse(cookieValue);
+            }
+
+            if (cart[bookId]) {
+                cart[bookId] += quantity;
+            } else {
+                cart[bookId] = quantity;
+            }
+
+            setCookie('shoppingCart', JSON.stringify(cart), 3650);
+
+            console.log(`Added ${quantity} of book ${bookId}. Current cart: ${JSON.stringify(cart)}`);
+        });
+    });
+});
+
+
+
+</script>
 </body>
 </html>

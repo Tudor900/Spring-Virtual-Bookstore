@@ -75,5 +75,11 @@ public class BookServiceImplementation implements BookService{
         bookRepository.deleteById(bookId);
     }
 
+    @Override
+    public List<Book> findByBookIDIn(List <Long> bookIDs){
+        return bookRepository.findByBookIDIn(bookIDs);
+
+    }
+
 
 }
