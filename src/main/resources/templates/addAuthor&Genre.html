@@ -16,7 +16,7 @@
 
 <h2 style="text-align: center;">Add New Author</h2>
 
-<form action="#" th:action="@{/addAuthor}" th:object="${author}" method="post">
+<form action="#" th:action="@{/saveauthor}" th:object="${author}" method="post">
     <label for="firstname">Firstname</label>
     <input type="text" id="firstname" th:field="*{firstname}" placeholder="First Name">
     <br>
@@ -36,9 +36,9 @@
 
 <h2 style="text-align: center;">Add New Genre</h2>
 
-<form action="#" th:action="@{/addGenre}" th:object="${book}" method="post">
+<form action="#" th:action="@{/savegenre}" th:object="${genre}" method="post">
     <label for="genre">Genre</label>
-    <input type="text" id="genre" th:field="*{genre}" placeholder="Genre">
+    <input type="text" id="genre" th:field="*{genreName}" placeholder="Genre">
     <br>
 
 

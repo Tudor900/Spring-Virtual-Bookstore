@@ -6,20 +6,21 @@ import com.example.bookstore.entity.Genre;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.CookieValue;
-import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.ui.Model;
 
 import com.example.bookstore.entity.Book;
 import com.example.bookstore.service.BookService;
 import com.example.bookstore.entity.Customer;
 import com.example.bookstore.service.CustomerService;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PostMapping;
+import com.example.bookstore.service.GenreService;
+import com.example.bookstore.service.AuthorService;
 
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 
+import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 
@@ -31,6 +32,10 @@ public class WebPageController {
     private BookService bookService;
     @Autowired
     private CustomerService customerService;
+    @Autowired
+    private GenreService genreService;
+    @Autowired
+    private AuthorService authorService;
 
     @GetMapping("/")
     public String homePage(@CookieValue(name="userId", required = false)String userId, Model model){
@@ -60,6 +65,9 @@ public class WebPageController {
         Book book = new Book();
         book.setAuthor(new Author());
         book.setGenre(new Genre());
+
+        model.addAttribute("genreList",genreService.fetchGenreList());
+        model.addAttribute("authorList", authorService.fetchAuthorList());
 
 
         model.addAttribute("book", book);
@@ -128,6 +136,49 @@ public class WebPageController {
         }
         return "redirect:/";
     }
+
+    @PostMapping("/savegenre")
+    public String saveGenre(@ModelAttribute("genre")Genre genre)
+    {
+        genreService.saveGenre(genre);
+        return "redirect:/";
+    }
+
+    @PostMapping("/saveauthor")
+    public String saveAuthor(@ModelAttribute("author")Author author)
+    {
+        authorService.saveAuthor(author);
+        return "redirect:/";
+    }
+
+
+    @GetMapping ("/addgenreorauthor")
+    public String addAuthorOrGenre(Model model)
+    {
+        Genre genre = new Genre();
+        Author author = new Author();
+        model.addAttribute("genre", genre);
+        model.addAttribute("author", author);
+        return "addAuthor&Genre";
+    }
+
+    @GetMapping("/useraccount")
+    public String userAccountSettings(@CookieValue(name="userId", required = true)String userId, Model model)
+    {
+        Customer customer = customerService.getCustomerByUniqueId(userId);
+        model.addAttribute("customer", customer);
+        return "usersettings";
+    }
+
+    @PostMapping("/saveaccount/{param}")
+    public String updateAccount(@CookieValue(name="userId", required = true)String userId, @PathVariable String param, @RequestParam Map<String, String> formData)
+    {
+        customerService.updateCustomer(param, userId, formData);
+
+
+        return "redirect:/useraccount";
+    }
+
 
 
 

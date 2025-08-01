@@ -93,9 +93,14 @@
 <div class="add-book-container">
     <!-- Changed <button> to <a> and used th:href for navigation -->
     <a th:if="${isLoggedIn and isAdmin}" th:href="@{/addBook}" class="btn btn-primary">Add Book</a>
+    <a th:if="${isLoggedIn and isAdmin}" th:href="@{/addgenreorauthor}" class="btn btn-primary">Add Author or Genre</a>
     <a th:if="${!isLoggedIn}" th:href="@{/login}" class="btn btn-primary">Login</a>
     <a th:if="${!isLoggedIn}" th:href="@{/createaccount}" class="btn btn-primary">Register</a>
+    <br><br>
 
+    <a th:if="${isLoggedIn}" th:href="@{/useraccount}" class="btn btn-primary">User Account</a>
+
+    <br><br>
     <form action="#" th:action="@{/logout}" method="post" th:if="${isLoggedIn}" >
     <button type="submit" class="btn btn-primary">Logout</button>
     </form>

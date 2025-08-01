@@ -8,6 +8,7 @@ import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.SecureRandom;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -64,6 +65,10 @@ public class CustomerServiceImplementation implements CustomerService{
 
     }
 
+    public Customer getCustomerByUniqueId(String uniqueID){
+        return customerRepository.findByUniqueID(uniqueID).orElseThrow(() -> new RuntimeException("Customer not found"));
+    }
+
     @Override
     public Boolean checkForAdmin(String uniqueID){
         System.out.println(uniqueID);
@@ -82,15 +87,30 @@ public class CustomerServiceImplementation implements CustomerService{
 
     // Update operation
     @Override
-    public Customer updateCustomer(Customer customer,
-                     Long customerId)
+    public Customer updateCustomer(String param, String uniqueID, Map<String,String> formData)
     {
+        Customer selectedCustomer = customerRepository.findByUniqueID(uniqueID).orElseThrow(() -> new RuntimeException("Customer not found"));
 
-        Customer depDB = customerRepository.findById(customerId).get();
+        switch (param){
+            case "name":
+                selectedCustomer.setFirstname(formData.get("firstname"));
+                selectedCustomer.setLastname(formData.get("lastname"));
+                break;
+            case "email":
+                selectedCustomer.setEmail(formData.get("email"));
+                break;
+            case "password":
+                selectedCustomer.setPassword(passwordEncoder.encode(formData.get("password")));
+                break;
+            case "address":
+                selectedCustomer.setAddress(formData.get("address"));
+                break;
+        }
 
 
 
-        return customerRepository.save(depDB);
+
+        return customerRepository.save(selectedCustomer);
     }
 
     // Delete operation
@@ -99,5 +119,7 @@ public class CustomerServiceImplementation implements CustomerService{
     {
         customerRepository.deleteById(customerId);
     }
+
+
 
 }

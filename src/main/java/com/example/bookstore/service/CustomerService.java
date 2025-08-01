@@ -2,6 +2,7 @@ package com.example.bookstore.service;
 import com.example.bookstore.entity.Customer;
 
 import java.util.List;
+import java.util.Map;
 
 public interface CustomerService {
 
@@ -9,7 +10,7 @@ public interface CustomerService {
 
     List<Customer> fetchCustomerList();
 
-    Customer updateCustomer(Customer customer, Long customerID);
+    Customer updateCustomer(String param, String uniqueID, Map<String, String> formData);
 
     Boolean checkForCustomer(Customer customer);
 
@@ -18,6 +19,8 @@ public interface CustomerService {
     Customer getCustomer(Customer customer);
 
     Boolean checkForAdmin(String uniqueID);
+
+    Customer getCustomerByUniqueId(String uniqueID);
 
     void deleteCustomerById(Long customerID);
 }

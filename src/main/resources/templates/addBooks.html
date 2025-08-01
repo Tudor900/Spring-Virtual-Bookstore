@@ -7,7 +7,7 @@
         body { font-family: sans-serif; margin: 20px; }
         form { background-color: #f4f4f4; padding: 20px; border-radius: 8px; max-width: 400px; margin: auto; }
         label { display: block; margin-bottom: 5px; font-weight: bold; }
-        input[type="text"] { width: calc(100% - 22px); padding: 10px; margin-bottom: 15px; border: 1px solid #ddd; border-radius: 4px; }
+        input[type="text"], select { width: calc(100% - 22px); padding: 10px; margin-bottom: 15px; border: 1px solid #ddd; border-radius: 4px; }
         button { background-color: #007bff; color: white; padding: 10px 15px; border: none; border-radius: 4px; cursor: pointer; font-size: 16px; }
         button:hover { background-color: #0056b3; }
     </style>
@@ -16,22 +16,30 @@
 
 <h2 style="text-align: center;">Add New Book</h2>
 
-<form action="#" th:action="@{/savebook}" th:object="${book}" method="post">
+<form action="#" th:action="@{/savebook}" th:object="${book}" method="post" id="bookform">
     <label for="titleInput">Title:</label>
     <input type="text" id="titleInput" th:field="*{title}" placeholder="Book Title">
-    <br>
 
     <label for="isbnInput">ISBN:</label>
-    <input type="text" id="isbnInput" th:field="*{isbn}" placeholder="Book ISBN">
-    <br>
+    <input type="text" id="isbnInput" th:field="*{isbn}" placeholder="Book ISBN" size="13">
 
-    <label for="authorIdInput">Author ID:</label>
-    <input type="text" id="authorIdInput" th:field="*{author.authorID}" placeholder="Existing Author ID">
-    <br>
+    <label for="genreSelect">Genre:</label>
+    <select id="genreSelect" th:field="*{genre.genreId}">
+        <option value="">-- Select a Genre --</option>
+        <option th:each="genre : ${genreList}"
+                th:value="${genre.genreId}"
+                th:text="${genre.genreName}">
+        </option>
+    </select>
 
-    <label for="genreIdInput">Genre ID:</label>
-    <input type="text" id="genreIdInput" th:field="*{genre.genreId}" placeholder="Existing Genre ID">
-    <br>
+    <label for="authorSelect">Author:</label>
+    <select id="authorSelect" th:field="*{author.authorID}">
+        <option value="">-- Select an Author --</option>
+        <option th:each="author : ${authorList}"
+                th:value="${author.authorID}"
+                th:text="${author.firstname + ' ' + author.lastname}">
+        </option>
+    </select>
 
     <button type="submit">Add Book</button>
 </form>
