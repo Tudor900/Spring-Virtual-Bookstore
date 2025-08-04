@@ -134,35 +134,9 @@
   </tbody>
 </table>
 
-<form th:action="@{/placeOrder}" method="post">
-
-  <!-- Use a th:each loop to create inputs for each book in the cart -->
-  <div th:each="book, status : ${cartBooks}" class="form-item">
-    <h4 th:text="'Book: ' + ${book.title}">Book: Example Title</h4>
-
-    <!-- Input for bookID -->
-    <label th:for="'bookId_' + ${status.index}">Book ID</label>
-    <input type="text"
-           th:id="'bookId_' + ${status.index}"
-           th:name="'orderItems[' + ${status.index} + '].bookID'"
-           th:value="${book.bookID}"
-           readonly>
-
-    <!-- Input for quantity -->
-    <label th:for="'quantity_' + ${status.index}">Quantity</label>
-    <input type="text"
-           th:id="'quantity_' + ${status.index}"
-           th:name="'orderItems[' + ${status.index} + '].quantity'"
-           th:value="${cartItems.get(T(java.lang.String).valueOf(book.bookID))}"
-           readonly>
-  </div>
-
-  <div style="margin-top: 20px; text-align: center;">
-    <button type="submit" class="btn btn-primary">Place Order</button>
-  </div>
-
+<form th:action="@{/sendorder}" th:method="post">
+<button type="submit" class="btn btn-primary">Send Order</button>
 </form>
-
 <script>
   document.addEventListener('DOMContentLoaded', function() {
       const updateCheckoutBtn = document.getElementById('update-checkout-btn');

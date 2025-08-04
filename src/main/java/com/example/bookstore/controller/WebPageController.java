@@ -1,8 +1,6 @@
 package com.example.bookstore.controller;
 
-import com.example.bookstore.entity.Author;
-import com.example.bookstore.entity.Customer;
-import com.example.bookstore.entity.Genre;
+import com.example.bookstore.entity.*;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,18 +8,24 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.ui.Model;
 
-import com.example.bookstore.entity.Book;
 import com.example.bookstore.service.BookService;
 import com.example.bookstore.entity.Customer;
 import com.example.bookstore.service.CustomerService;
 import com.example.bookstore.service.GenreService;
 import com.example.bookstore.service.AuthorService;
-
+import com.example.bookstore.service.OrderItemService;
+import com.example.bookstore.service.OrderService;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 
+
+import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
+
+
 import java.util.*;
 import java.util.stream.Collectors;
+
+import static java.lang.Long.valueOf;
 
 
 @Controller
@@ -36,6 +40,13 @@ public class WebPageController {
     private GenreService genreService;
     @Autowired
     private AuthorService authorService;
+    @Autowired
+    private OrderService orderService;
+    @Autowired
+    private OrderItemService orderItemService;
+
+
+
 
     @GetMapping("/")
     public String homePage(@CookieValue(name="userId", required = false)String userId, Model model){
@@ -59,6 +70,17 @@ public class WebPageController {
 
         return "index";
     }
+
+    @GetMapping("/secured-page")
+    public String securedPage(Model model, OAuth2AuthenticationToken authentication) {
+        // Retrieve user attributes from the OAuth2AuthenticationToken
+        var userAttributes = authentication.getPrincipal().getAttributes();
+        model.addAttribute("name", userAttributes.get("name"));
+        model.addAttribute("email", userAttributes.get("email"));
+
+        return "secured-page"; // This is a page only accessible to authenticated users
+    }
+
 
     @GetMapping("/addBook")
     public String addBookPage(Model model){
@@ -225,5 +247,57 @@ public class WebPageController {
     }
 
 
+    @PostMapping("/sendorder")
+    public String sendOrder(@CookieValue(name = "shoppingCart", required = true) String shoppingCartCookie, Model model, @CookieValue(name="userId", required = true) String userId) {
+        List cartBooks = Collections.emptyList();
+        Customer customer = customerService.getCustomerByUniqueId(userId);
 
+        List<OrderItem> orderItemList = new ArrayList<>();
+
+        Order order = Order.builder().customer(customer).build();
+        if (shoppingCartCookie != null && !shoppingCartCookie.isEmpty()) {
+            try {
+
+
+
+
+
+
+
+
+
+
+                ObjectMapper objectMapper = new ObjectMapper();
+                Map<String, Integer> cartItems = objectMapper.readValue(shoppingCartCookie, Map.class);
+
+                for (Map.Entry<String, Integer> entry : cartItems.entrySet()){
+                    String bookID = entry.getKey();
+                    Book book = bookService.findByBookID(valueOf(bookID));
+
+                    Integer bookQuant = entry.getValue();
+
+
+                    OrderItem orderItem = OrderItem.builder().order(order).book(book).quantity(bookQuant).build();
+
+                    order.getOrderItems().add(orderItem);
+                }
+
+
+
+
+
+            } catch (Exception e) {
+                // Handle parsing errors, e.g., malformed cookie data
+                e.printStackTrace();
+            }
+        }
+
+
+        orderService.saveOrder(order);
+
+
+
+
+        return "redirect:/checkout";
+    }
 }

@@ -108,6 +108,7 @@
     <a th:if="${isLoggedIn and isAdmin}" th:href="@{/addgenreorauthor}" class="btn btn-primary">Add Author or Genre</a>
     <a th:if="${!isLoggedIn}" th:href="@{/login}" class="btn btn-primary">Login</a>
     <a th:if="${!isLoggedIn}" th:href="@{/createaccount}" class="btn btn-primary">Register</a>
+    <a th:href="@{/oauth2/authorization/google}">Login with Google</a>
     <br><br>
 
     <a th:if="${isLoggedIn}" th:href="@{/useraccount}" class="btn btn-primary">User Account</a>

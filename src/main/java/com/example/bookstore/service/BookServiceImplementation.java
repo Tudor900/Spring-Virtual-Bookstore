@@ -81,5 +81,10 @@ public class BookServiceImplementation implements BookService{
 
     }
 
+    @Override
+    public Book findByBookID(Long id){
+        return bookRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Genre not found"));
+    }
+
 
 }

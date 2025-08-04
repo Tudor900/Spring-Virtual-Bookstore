@@ -11,6 +11,7 @@ import org.springframework.security.web.SecurityFilterChain;
 
 
 @Configuration
+@EnableWebSecurity
 public class SecurityConfig {
 
     @Bean
@@ -18,5 +19,30 @@ public class SecurityConfig {
         return new BCryptPasswordEncoder();
     }
 
+    @Bean
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        http
+                .authorizeHttpRequests(authorize -> authorize
+                        // Allow access to the home page and static resources
+                        .requestMatchers("/", "/css/**", "/js/**").permitAll()
+                        // All other requests must be authenticated
+                        .anyRequest().authenticated()
+                )
+                .formLogin(form -> form
+                        .loginPage("/login") // Tell Spring to use your custom login page
+                        .permitAll()
+                )
+                .oauth2Login(oauth2 -> oauth2
+                        // Enables the default OAuth2 login page
+                        // The /login/oauth2/code/google endpoint is automatically handled
+                        .defaultSuccessUrl("/secured-page", true)
 
+                )
+                ;
+
+        return http.build();
+    }
 }
+
+
+
