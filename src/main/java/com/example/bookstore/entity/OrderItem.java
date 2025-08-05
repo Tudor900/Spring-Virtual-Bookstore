@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString; // Import Lombok's ToString
 
 @Entity
 @Data
@@ -13,6 +14,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Builder
 @Table(name = "order_item", schema = "BOOKSTORE_SCHEMA")
+@ToString(exclude = {"order"}) // Exclude the field causing the loop
 public class OrderItem {
 
     @Id
@@ -20,17 +22,14 @@ public class OrderItem {
     private Long orderitemID;
 
     @JsonBackReference
-    // Many OrderItems belong to one Order
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "order_id", nullable = false)
     private Order order;
 
-    // Many OrderItems refer to one Book
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "book_id", nullable = false)
     private Book book;
 
-    // The quantity is an attribute of the relationship
     @Column(nullable = false)
     private Integer quantity;
 

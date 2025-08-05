@@ -300,4 +300,27 @@ public class WebPageController {
 
         return "redirect:/checkout";
     }
+
+
+
+
+    @GetMapping("/myorders")
+    public String myOrders(@CookieValue(value = "userId", required = true)String userId, Model model)
+    {
+        Customer customer = customerService.getCustomerByUniqueId(userId);
+        List<Order> orders = orderService.fetchCustomerOrders(customer);
+
+        model.addAttribute("listoforders", orders);
+        return "/myorders";
+    }
+
+    @GetMapping("/allorders")
+    public String allOrders(@CookieValue(value ="userId")String userId, Model model){
+        if(customerService.checkForAdmin(userId)){
+            List<Order> orders = orderService.fetchOrderList();
+            model.addAttribute("listoforders", orders);
+            return "/allorders";
+        }
+        return "redirect:/";
+    }
 }

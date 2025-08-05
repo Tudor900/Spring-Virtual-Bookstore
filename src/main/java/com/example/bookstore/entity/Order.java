@@ -6,13 +6,12 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString; // Import Lombok's ToString
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.UUID;
 
 @Entity
 @Data
@@ -20,7 +19,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @Builder
 @Table(name = "Order_table", schema = "BOOKSTORE_SCHEMA")
-
+@ToString(exclude = {"customer", "orderItems"}) // Exclude fields causing the loop
 public class Order {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -37,5 +36,4 @@ public class Order {
     @Builder.Default
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<OrderItem> orderItems = new ArrayList<>();
-
 }

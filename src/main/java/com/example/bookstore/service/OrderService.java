@@ -1,4 +1,5 @@
 package com.example.bookstore.service;
+import com.example.bookstore.entity.Customer;
 import com.example.bookstore.entity.Order;
 
 import java.util.List;
@@ -11,4 +12,6 @@ public interface OrderService {
     Order  updateOrder(Order order ,Long orderID);
 
     void deleteOrderById(Long orderID);
+
+    List<Order> fetchCustomerOrders(Customer customer);
 }

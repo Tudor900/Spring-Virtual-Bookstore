@@ -16,8 +16,8 @@
 <body>
 
 <h2> Create Account</h2>
-
-<form action="#" th:action="@{/updateaccount}" th:object="${customer}" method="post">
+<a th:href="@{/}" class="btn btn-primary">Back</a>
+<form action="#" th:action="@{/savenewaccount}" th:object="${customer}" method="post">
   <label for="firstname">Firstname</label>
   <input type="text" id="firstname" th:field="*{firstname}" placeholder="First Name">
   <br>
@@ -38,7 +38,7 @@
   <input type="text" id="address" th:field="*{address}" placeholder="Address">
   <br>
 
-  <button type="submit">Add Book</button>
+  <button type="submit">Create Account</button>
 </form>
 
 

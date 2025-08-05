@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Bookstore - List of Books</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            margin: 20px;
+            background-color: #f8f9fa;
+            color: #343a40;
+        }
+        h2 {
+            text-align: center;
+            color: #007bff;
+            margin-bottom: 25px;
+        }
+        table {
+            width: 80%;
+            margin: 20px auto;
+            border-collapse: collapse;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            background-color: #fff;
+            border-radius: 8px;
+            overflow: hidden; /* Ensures rounded corners apply to table content */
+        }
+        th, td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #dee2e6;
+        }
+        th {
+            background-color: #007bff;
+            color: white;
+            font-weight: bold;
+        }
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+        tr:hover {
+            background-color: #e9ecef;
+        }
+        .add-book-container {
+            text-align: center;
+            margin-top: 30px;
+        }
+        .btn {
+            display: inline-block;
+            padding: 10px 20px;
+            font-size: 16px;
+            font-weight: bold;
+            text-align: center;
+            text-decoration: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+        .btn-primary {
+            background-color: #007bff;
+            color: white;
+            border: 1px solid #007bff;
+        }
+        .btn-primary:hover {
+            background-color: #0056b3;
+            border-color: #0056b3;
+        }
+
+    </style>
+
+
+</head>
+<body>
+
+<h2 style="text-align: center;">The List of Orders</h2>
+
+
+<a th:href="@{/}" class="btn btn-primary">Back</a>
+<table>
+    <thead>
+    <tr>
+        <th>Order ID</th>
+        <th>Order Date</th>
+        <th>Book Title</th>
+        <th>Quantity</th>
+    </tr>
+    </thead>
+    <tbody>
+    <th:block th:each="order, orderStat : ${listoforders}">
+        <tr th:each="item, itemStat : ${order.orderItems}">
+            <td th:if="${itemStat.first}" th:text="${order.orderID}" th:rowspan="${#lists.size(order.orderItems)}"></td>
+            <td th:if="${itemStat.first}" th:text="${#dates.format(order.sentOn, 'yyyy-MM-dd HH:mm:ss')}" th:rowspan="${#lists.size(order.orderItems)}"></td>
+
+            <td th:text="${item.book.title}"></td>
+            <td th:text="${item.quantity}"></td>
+        </tr>
+    </th:block>
+    </tbody>
+</table>
+
+<div class="add-book-container">
+    <!-- Changed <button> to <a> and used th:href for navigation -->
+
+
+    <a th:if="${isLoggedIn}" th:href="@{/useraccount}" class="btn btn-primary">User Account</a>
+
+
+</div>
+
+<script>
+
+
+
+
+
+</script>
+</body>
+</html>

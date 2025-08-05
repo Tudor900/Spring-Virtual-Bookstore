@@ -1,13 +1,17 @@
 package com.example.bookstore.entity;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString; // Import Lombok's ToString
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -16,6 +20,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @Builder
 @Table(name = "Customer", schema = "BOOKSTORE_SCHEMA")
+@ToString(exclude = "orders") // Exclude the field causing the loop
 public class Customer {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -23,7 +28,7 @@ public class Customer {
     private String firstname;
     private String lastname;
     private String email;
-    private String password; //to be stored only encrypted
+    private String password;
     private String address;
     @CreationTimestamp
     private Instant createdOn;
@@ -31,4 +36,8 @@ public class Customer {
     private boolean isAdmin = false;
     @Column(name = "UNIQUEID")
     private String uniqueID ;
+
+    @JsonManagedReference
+    @OneToMany(mappedBy = "customer", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    private List<Order> orders = new ArrayList<>();
 }

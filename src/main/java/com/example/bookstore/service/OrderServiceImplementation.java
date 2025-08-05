@@ -2,6 +2,7 @@ package com.example.bookstore.service;
 
 import com.example.bookstore.entity.Order;
 import com.example.bookstore.repository.OrderRepository;
+import com.example.bookstore.entity.Customer;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -26,6 +27,11 @@ public class OrderServiceImplementation implements OrderService{
     @Override
     public List<Order> fetchOrderList(){
         return (List<Order>)orderRepository.findAll();
+    }
+
+    public List<Order> fetchCustomerOrders(Customer customer){
+
+        return orderRepository.findByCustomer(customer);
     }
 
     @Override

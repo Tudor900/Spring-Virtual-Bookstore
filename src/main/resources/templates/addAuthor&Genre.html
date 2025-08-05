@@ -15,7 +15,7 @@
 <body>
 
 <h2 style="text-align: center;">Add New Author</h2>
-
+<a th:href="@{/}" class="btn btn-primary">Back</a>
 <form action="#" th:action="@{/saveauthor}" th:object="${author}" method="post">
     <label for="firstname">Firstname</label>
     <input type="text" id="firstname" th:field="*{firstname}" placeholder="First Name">

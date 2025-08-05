@@ -15,7 +15,7 @@
 <body>
 
 <h2 style="text-align: center;">Add New Book</h2>
-
+<a th:href="@{/}" class="btn btn-primary">Back</a>
 <form action="#" th:action="@{/savebook}" th:object="${book}" method="post" id="bookform">
     <label for="titleInput">Title:</label>
     <input type="text" id="titleInput" th:field="*{title}" placeholder="Book Title">
