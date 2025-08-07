@@ -12,4 +12,5 @@ import java.util.UUID;
 public interface CustomerRepository extends CrudRepository <Customer,Long>{
     Optional<Customer> findByEmail(String email);
     Optional<Customer> findByUniqueID(String uniqueID);
+
 }

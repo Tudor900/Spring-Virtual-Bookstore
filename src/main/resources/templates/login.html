@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bookstore - Login</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #5d5dff;
+            --primary-dark: #4b4bb2;
+            --secondary-color: #f0f4f8;
+            --text-color: #2c3e50;
+            --card-background: #ffffff;
+            --border-color: #e0e6ed;
+            --shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+            --transition: all 0.2s ease-in-out;
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            background-color: var(--secondary-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .login-container {
+            background-color: var(--card-background);
+            padding: 2.5rem;
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+            width: 100%;
+            max-width: 450px;
+            text-align: center;
+        }
+
+        .login-container h2 {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 2rem;
+        }
+
+        .form-field {
+            margin-bottom: 1rem;
+            text-align: left;
+        }
+
+        .form-field label {
+            display: block;
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: #607d8b;
+            margin-bottom: 0.5rem;
+        }
+
+        .form-field input[type="text"],
+        .form-field input[type="password"] {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            box-sizing: border-box;
+            transition: var(--transition);
+        }
+
+        .form-field input[type="text"]:focus,
+        .form-field input[type="password"]:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 2px rgba(93, 93, 255, 0.2);
+        }
+
+        .form-field input[type="submit"] {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 12px 24px;
+            font-size: 1rem;
+            font-weight: 500;
+            text-align: center;
+            text-decoration: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: var(--transition);
+            border: 2px solid var(--primary-color);
+            background-color: var(--primary-color);
+            color: var(--card-background);
+            width: 100%;
+            margin-top: 1rem;
+        }
+
+        .form-field input[type="submit"]:hover {
+            background-color: var(--primary-dark);
+            border-color: var(--primary-dark);
+            transform: translateY(-1px);
+        }
+
+        .error-message, .success-message {
+            color: white;
+            padding: 10px;
+            margin-bottom: 15px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+        }
+
+        .error-message {
+            background-color: #e74c3c;
+            border: 1px solid #e74c3c;
+        }
+
+        .success-message {
+            background-color: #2ecc71;
+            border: 1px solid #2ecc71;
+        }
+
+        .oauth-section {
+            margin-top: 2rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .oauth-section p {
+            margin-bottom: 1.5rem;
+            color: #607d8b;
+        }
+
+        .oauth-btn {
+            display: block;
+            width: 100%;
+            padding: 12px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 500;
+            color: white;
+            transition: var(--transition);
+            margin-bottom: 1rem;
+        }
+
+        .oauth-btn:hover {
+            opacity: 0.9;
+            transform: translateY(-1px);
+        }
+
+        .google-btn {
+            background-color: #DB4437;
+        }
+
+        .github-btn {
+            background-color: #333;
+        }
+
+        .register-link {
+            margin-top: 2rem;
+            font-size: 0.9rem;
+            color: #607d8b;
+        }
+
+        .register-link a {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .register-link a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+<div class="login-container">
+    <h2>Login</h2>
+
+    <div th:if="${param.error}" class="error-message">
+        Invalid email or password.
+    </div>
+    <div th:if="${param.oauth_error}" class="error-message">
+        OAuth login failed. Please try again.
+    </div>
+    <div th:if="${param.logout}" class="success-message">
+        You have been logged out.
+    </div>
+
+    <form th:action="@{/login}" method="post">
+        <div class="form-field">
+            <label for="username">Email:</label>
+            <input type="text" id="username" name="username" required autofocus>
+        </div>
+        <div class="form-field">
+            <label for="password">Password:</label>
+            <input type="password" id="password" name="password" required>
+        </div>
+        <div class="form-field">
+            <input type="submit" value="Log In">
+        </div>
+    </form>
+
+    <div class="oauth-section">
+        <p>Or log in with:</p>
+        <a th:href="@{/oauth2/authorization/google}" class="oauth-btn google-btn">Login with Google</a>
+    </div>
+
+    <div class="register-link">
+        Don't have an account? <a th:href="@{/register}">Register here</a>
+    </div>
+</div>
+</body>
+</html>

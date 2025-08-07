@@ -2,182 +2,282 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Bookstore - List of Books</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bookstore - Our Collection</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
+        :root {
+            --primary-color: #5d5dff;
+            --primary-dark: #4b4bb2;
+            --secondary-color: #f0f4f8;
+            --text-color: #2c3e50;
+            --card-background: #ffffff;
+            --border-color: #e0e6ed;
+            --shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+            --transition: all 0.2s ease-in-out;
+        }
+
         body {
-            font-family: sans-serif;
-            margin: 20px;
-            background-color: #f8f9fa;
-            color: #343a40;
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            background-color: var(--secondary-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            padding: 20px;
         }
-        h2 {
-            text-align: center;
-            color: #007bff;
-            margin-bottom: 25px;
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
         }
-        table {
-            width: 80%;
-            margin: 20px auto;
-            border-collapse: collapse;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-            background-color: #fff;
-            border-radius: 8px;
-            overflow: hidden; /* Ensures rounded corners apply to table content */
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+            padding: 20px;
+            background-color: var(--card-background);
+            border-radius: 12px;
+            box-shadow: var(--shadow);
         }
-        th, td {
-            padding: 12px 15px;
-            text-align: left;
-            border-bottom: 1px solid #dee2e6;
+
+        .header h2 {
+            margin: 0;
+            font-size: 2rem;
+            color: var(--primary-color);
+            font-weight: 700;
         }
-        th {
-            background-color: #007bff;
-            color: white;
-            font-weight: bold;
+
+        .cta-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            align-items: center;
+            justify-content: flex-end;
         }
-        tr:nth-child(even) {
-            background-color: #f2f2f2;
-        }
-        tr:hover {
-            background-color: #e9ecef;
-        }
-        .add-book-container {
-            text-align: center;
-            margin-top: 30px;
-        }
+
         .btn {
-            display: inline-block;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
             padding: 10px 20px;
-            font-size: 16px;
-            font-weight: bold;
+            font-size: 1rem;
+            font-weight: 500;
             text-align: center;
             text-decoration: none;
-            border-radius: 5px;
+            border-radius: 8px;
             cursor: pointer;
-            transition: background-color 0.3s ease;
-        }
-        .btn-primary {
-            background-color: #007bff;
-            color: white;
-            border: 1px solid #007bff;
-        }
-        .btn-primary:hover {
-            background-color: #0056b3;
-            border-color: #0056b3;
+            transition: var(--transition);
+            border: 2px solid var(--primary-color);
+            background-color: var(--primary-color);
+            color: var(--card-background);
         }
 
+        .btn:hover {
+            background-color: var(--primary-dark);
+            border-color: var(--primary-dark);
+            transform: translateY(-1px);
+        }
+
+        .btn-secondary {
+            background-color: transparent;
+            color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+
+        .btn-secondary:hover {
+            background-color: var(--primary-color);
+            color: var(--card-background);
+        }
+
+        .book-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+        }
+
+        .book-card {
+            background-color: var(--card-background);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .book-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .book-card h3 {
+            font-size: 1.25rem;
+            margin: 0;
+            color: var(--primary-color);
+            font-weight: 700;
+        }
+
+        .book-card p {
+            margin: 0;
+            font-size: 0.9rem;
+            color: #607d8b;
+        }
+
+        .book-card strong {
+            color: var(--text-color);
+            font-weight: 500;
+        }
+
+        .add-to-cart-form {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: auto;
+        }
+
+        .quant-input {
+            width: 60px;
+            padding: 8px 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            text-align: center;
+            font-size: 1rem;
+            transition: var(--transition);
+        }
+
+        .quant-input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 2px rgba(93, 93, 255, 0.2);
+        }
+
+        .action-buttons-footer {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        @media (max-width: 768px) {
+            .header {
+                flex-direction: column;
+                text-align: center;
+            }
+            .cta-container {
+                justify-content: center;
+            }
+        }
     </style>
-
-
 </head>
 <body>
 
-<h2 style="text-align: center;">The List of Books</h2>
+<div class="container">
+    <div class="header">
+        <h2>Bookstore Collection</h2>
+        <div class="cta-container">
+            <a th:if="${isLoggedIn}" th:href="@{/checkout}" class="btn">Checkout</a>
+            <a th:if="${isLoggedIn and isAdmin}" th:href="@{/addBook}" class="btn">Add Book</a>
+            <a th:if="${isLoggedIn and isAdmin}" th:href="@{/addgenreorauthor}" class="btn">Add Author/Genre</a>
+        </div>
+    </div>
 
-<a th:if="${isLoggedIn}" th:href="@{/checkout}" class="btn btn-primary">Go to Checkout</a>
-
-
-
-<table>
-    <thead>
-    <tr>
-        <th>Title</th>
-        <th>ISBN</th>
-        <th>Author</th>
-        <th th:if="${isLoggedIn}"></th>
-    </tr>
-    </thead>
-    <tbody>
-    <tr th:each="book:${listofbooks}">
-        <td th:text="${book.title}"></td>
-        <td th:text="${book.isbn}"></td>
-        <td th:text="${book.author.firstname} + ' ' + ${book.author.lastname}"></td>
-        <td th:if="${isLoggedIn}">
-            <form class="add-to-cart-form">
-                <button type="submit" class="btn btn-primary">Add to Cart</button>
-                <input type="number" value="1" size="1" min="1" max="9" class="quant-input">
+    <div class="book-list">
+        <div class="book-card" th:each="book:${listofbooks}">
+            <h3><span th:text="${book.title}"></span></h3>
+            <p><strong>Author:</strong> <span th:text="${book.author.firstname} + ' ' + ${book.author.lastname}"></span></p>
+            <p><strong>ISBN:</strong> <span th:text="${book.isbn}"></span></p>
+            <form th:if="${isLoggedIn}" class="add-to-cart-form">
+                <button type="submit" class="btn">Add to Cart</button>
+                <input type="number" value="1" size="1" min="1" max="99" class="quant-input">
                 <input type="hidden" class="book-id-input" th:value="${book.bookID}">
             </form>
-        </td>
-    </tr>
-    </tbody>
-</table>
+        </div>
+    </div>
 
-<div class="add-book-container">
-    <!-- Changed <button> to <a> and used th:href for navigation -->
-    <a th:if="${isLoggedIn and isAdmin}" th:href="@{/addBook}" class="btn btn-primary">Add Book</a>
-    <a th:if="${isLoggedIn and isAdmin}" th:href="@{/addgenreorauthor}" class="btn btn-primary">Add Author or Genre</a>
-    <a th:if="${!isLoggedIn}" th:href="@{/login}" class="btn btn-primary">Login</a>
-    <a th:if="${!isLoggedIn}" th:href="@{/createaccount}" class="btn btn-primary">Register</a>
-    <a th:href="@{/oauth2/authorization/google}">Login with Google</a>
-    <br><br>
+    <div class="action-buttons-footer">
 
-    <a th:if="${isLoggedIn}" th:href="@{/useraccount}" class="btn btn-primary">User Account</a>
 
-    <br><br>
-    <form action="#" th:action="@{/logout}" method="post" th:if="${isLoggedIn}" >
-    <button type="submit" class="btn btn-primary">Logout</button>
-    </form>
+        <a th:if="${isLoggedIn}" th:href="@{/useraccount}" class="btn btn-secondary">My Account</a>
+        <a th:if="${isLoggedIn}" th:href="@{/myorders}" class="btn btn-secondary">My Orders</a>
+        <a th:if="${isLoggedIn and isAdmin}" th:href="@{/allorders}" class="btn btn-secondary">All Orders</a>
+        <form action="#" th:action="@{/logout}" method="post" th:if="${isLoggedIn}">
+            <button type="submit" class="btn btn-secondary">Logout</button>
+        </form>
+    </div>
 </div>
 
 <script>
-
     document.addEventListener('DOMContentLoaded', function() {
-
-    function getCookie(name) {
-        const value = `; ${document.cookie}`;
-        const parts = value.split(`; ${name}=`);
-        if (parts.length === 2) {
-            // Decode the cookie value when reading it
-            return decodeURIComponent(parts.pop().split(';').shift());
+        function getCookie(name) {
+            const value = `; ${document.cookie}`;
+            const parts = value.split(`; ${name}=`);
+            if (parts.length === 2) {
+                return decodeURIComponent(parts.pop().split(';').shift());
+            }
         }
-    }
 
-    function setCookie(name, value, days) {
-        let expires = "";
-        if (days) {
-            const date = new Date();
-            date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
-            expires = "; expires=" + date.toUTCString();
+        function setCookie(name, value, days) {
+            let expires = "";
+            if (days) {
+                const date = new Date();
+                date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+                expires = "; expires=" + date.toUTCString();
+            }
+            document.cookie = name + "=" + (encodeURIComponent(value) || "")  + expires + "; path=/";
         }
-        // Encode the cookie value before setting it
-        document.cookie = name + "=" + (encodeURIComponent(value) || "")  + expires + "; path=/";
-    }
 
-    const forms = document.querySelectorAll('.add-to-cart-form');
+        const forms = document.querySelectorAll('.add-to-cart-form');
 
-    forms.forEach(form => {
-        form.addEventListener('submit', function(event) {
-            event.preventDefault();
+        forms.forEach(form => {
+            form.addEventListener('submit', function(event) {
+                event.preventDefault();
 
-            const bookId = form.querySelector('.book-id-input').value;
-            const quantity = parseInt(form.querySelector('.quant-input').value);
+                const bookId = form.querySelector('.book-id-input').value;
+                const quantityInput = form.querySelector('.quant-input');
+                const quantity = parseInt(quantityInput.value);
 
-            if (!bookId || isNaN(quantity) || quantity < 1) {
-                return;
-            }
+                if (!bookId || isNaN(quantity) || quantity < 1) {
+                    return;
+                }
 
-            const cookieValue = getCookie('shoppingCart');
-            let cart = {};
+                const cookieValue = getCookie('shoppingCart');
+                let cart = {};
 
-            if (cookieValue) {
-                cart = JSON.parse(cookieValue);
-            }
+                if (cookieValue) {
+                    try {
+                        cart = JSON.parse(cookieValue);
+                    } catch (e) {
+                        console.error("Failed to parse shopping cart cookie:", e);
+                    }
+                }
 
-            if (cart[bookId]) {
-                cart[bookId] += quantity;
-            } else {
-                cart[bookId] = quantity;
-            }
+                if (cart[bookId]) {
+                    cart[bookId] += quantity;
+                } else {
+                    cart[bookId] = quantity;
+                }
 
-            setCookie('shoppingCart', JSON.stringify(cart), 3650);
+                setCookie('shoppingCart', JSON.stringify(cart), 3650);
 
-            console.log(`Added ${quantity} of book ${bookId}. Current cart: ${JSON.stringify(cart)}`);
+                console.log(`Added ${quantity} of book ${bookId}. Current cart: ${JSON.stringify(cart)}`);
+                alert(`Added ${quantity} of book ${bookId} to your cart!`);
+
+                // Reset the quantity input to 1 after adding
+                quantityInput.value = 1;
+            });
         });
     });
-});
-
-
-
 </script>
 </body>
 </html>

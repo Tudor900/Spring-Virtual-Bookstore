@@ -1,46 +1,134 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8">
-    <title>Title</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bookstore - Create Account</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
   <style>
-    body { font-family: sans-serif; margin: 20px; }
-    form { background-color: #f4f4f4; padding: 20px; border-radius: 8px; max-width: 400px; margin: auto; }
-    label { display: block; margin-bottom: 5px; font-weight: bold; }
-    input[type="text"] { width: calc(100% - 22px); padding: 10px; margin-bottom: 15px; border: 1px solid #ddd; border-radius: 4px; }
-    input[type="password"] { width: calc(100% - 22px); padding: 10px; margin-bottom: 15px; border: 1px solid #ddd; border-radius: 4px; }
-    button { background-color: #007bff; color: white; padding: 10px 15px; border: none; border-radius: 4px; cursor: pointer; font-size: 16px; }
-    button:hover { background-color: #0056b3; }
+    :root {
+        --primary-color: #5d5dff;
+        --primary-dark: #4b4bb2;
+        --secondary-color: #f0f4f8;
+        --text-color: #2c3e50;
+        --card-background: #ffffff;
+        --border-color: #e0e6ed;
+        --shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+        --transition: all 0.2s ease-in-out;
+    }
+
+    body {
+        font-family: 'Roboto', sans-serif;
+        margin: 0;
+        background-color: var(--secondary-color);
+        color: var(--text-color);
+        line-height: 1.6;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+    }
+
+    .form-container {
+        background-color: var(--card-background);
+        padding: 2.5rem;
+        border-radius: 12px;
+        box-shadow: var(--shadow);
+        width: 100%;
+        max-width: 450px;
+        text-align: center;
+    }
+
+    .form-container h2 {
+        font-size: 2rem;
+        font-weight: 700;
+        color: var(--primary-color);
+        margin-bottom: 2rem;
+    }
+
+    .form-field {
+        margin-bottom: 1rem;
+        text-align: left;
+    }
+
+    .form-field label {
+        display: block;
+        font-size: 0.9rem;
+        font-weight: 500;
+        color: #607d8b;
+        margin-bottom: 0.5rem;
+    }
+
+    .form-field input {
+        width: 100%;
+        padding: 12px;
+        border: 1px solid var(--border-color);
+        border-radius: 8px;
+        box-sizing: border-box;
+        transition: var(--transition);
+    }
+
+    .form-field input:focus {
+        outline: none;
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 2px rgba(93, 93, 255, 0.2);
+    }
+
+    .btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 12px 24px;
+        font-size: 1rem;
+        font-weight: 500;
+        text-align: center;
+        text-decoration: none;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: var(--transition);
+        border: 2px solid var(--primary-color);
+        background-color: var(--primary-color);
+        color: var(--card-background);
+        width: 100%;
+        margin-top: 1rem;
+    }
+
+    .btn:hover {
+        background-color: var(--primary-dark);
+        border-color: var(--primary-dark);
+        transform: translateY(-1px);
+    }
   </style>
 </head>
 <body>
-
-<h2> Create Account</h2>
-<a th:href="@{/}" class="btn btn-primary">Back</a>
-<form action="#" th:action="@{/savenewaccount}" th:object="${customer}" method="post">
-  <label for="firstname">Firstname</label>
-  <input type="text" id="firstname" th:field="*{firstname}" placeholder="First Name">
-  <br>
-
-  <label for="lastname">Last Name</label>
-  <input type="text" id="lastname" th:field="*{lastname}" placeholder="Last Name">
-  <br>
-
-  <label for="email">Email</label>
-  <input type="text" id="email" th:field="*{email}" placeholder="Email">
-  <br>
-
-  <label for="password">Password</label>
-  <input type="password" id="password" th:field="*{password}" placeholder="Password">
-  <br>
-
-  <label for="address">Address:</label>
-  <input type="text" id="address" th:field="*{address}" placeholder="Address">
-  <br>
-
-  <button type="submit">Create Account</button>
-</form>
-
-
+<div class="form-container">
+  <h2>Create Account</h2>
+  <a th:href="@{/}" class="btn-secondary">Back</a>
+  <form action="#" th:action="@{/savenewaccount}" th:object="${customer}" method="post">
+    <div class="form-field">
+      <label for="firstname">First Name</label>
+      <input type="text" id="firstname" th:field="*{firstname}" placeholder="First Name">
+    </div>
+    <div class="form-field">
+      <label for="lastname">Last Name</label>
+      <input type="text" id="lastname" th:field="*{lastname}" placeholder="Last Name">
+    </div>
+    <div class="form-field">
+      <label for="email">Email</label>
+      <input type="text" id="email" th:field="*{email}" placeholder="Email">
+    </div>
+    <div class="form-field">
+      <label for="password">Password</label>
+      <input type="password" id="password" th:field="*{password}" placeholder="Password">
+    </div>
+    <div class="form-field">
+      <label for="address">Address:</label>
+      <input type="text" id="address" th:field="*{address}" placeholder="Address">
+    </div>
+    <button type="submit" class="btn">Create Account</button>
+  </form>
+</div>
 </body>
 </html>

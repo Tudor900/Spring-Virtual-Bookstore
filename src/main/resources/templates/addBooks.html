@@ -2,47 +2,154 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Add New Book</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bookstore - Add New Book</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
-        body { font-family: sans-serif; margin: 20px; }
-        form { background-color: #f4f4f4; padding: 20px; border-radius: 8px; max-width: 400px; margin: auto; }
-        label { display: block; margin-bottom: 5px; font-weight: bold; }
-        input[type="text"], select { width: calc(100% - 22px); padding: 10px; margin-bottom: 15px; border: 1px solid #ddd; border-radius: 4px; }
-        button { background-color: #007bff; color: white; padding: 10px 15px; border: none; border-radius: 4px; cursor: pointer; font-size: 16px; }
-        button:hover { background-color: #0056b3; }
+        :root {
+            --primary-color: #5d5dff;
+            --primary-dark: #4b4bb2;
+            --secondary-color: #f0f4f8;
+            --text-color: #2c3e50;
+            --card-background: #ffffff;
+            --border-color: #e0e6ed;
+            --shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+            --transition: all 0.2s ease-in-out;
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            background-color: var(--secondary-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+            padding: 20px;
+            background-color: var(--card-background);
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+        }
+
+        .header h2 {
+            margin: 0;
+            font-size: 2rem;
+            color: var(--primary-color);
+            font-weight: 700;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 10px 20px;
+            font-size: 1rem;
+            font-weight: 500;
+            text-align: center;
+            text-decoration: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: var(--transition);
+            border: 2px solid var(--primary-color);
+            background-color: var(--primary-color);
+            color: var(--card-background);
+        }
+
+        .btn:hover {
+            background-color: var(--primary-dark);
+            border-color: var(--primary-dark);
+            transform: translateY(-1px);
+        }
+
+        .form-card {
+            background-color: var(--card-background);
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        label {
+            display: block;
+            font-weight: 500;
+            margin-bottom: 5px;
+        }
+
+        input[type="text"], select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            box-sizing: border-box;
+            transition: var(--transition);
+        }
+
+        input[type="text"]:focus, select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 2px rgba(93, 93, 255, 0.2);
+        }
     </style>
 </head>
 <body>
 
-<h2 style="text-align: center;">Add New Book</h2>
-<a th:href="@{/}" class="btn btn-primary">Back</a>
-<form action="#" th:action="@{/savebook}" th:object="${book}" method="post" id="bookform">
-    <label for="titleInput">Title:</label>
-    <input type="text" id="titleInput" th:field="*{title}" placeholder="Book Title">
+<div class="container">
+    <div class="header">
+        <h2>Add New Book</h2>
+        <a th:href="@{/}" class="btn">Back to Books</a>
+    </div>
 
-    <label for="isbnInput">ISBN:</label>
-    <input type="text" id="isbnInput" th:field="*{isbn}" placeholder="Book ISBN" size="13">
+    <div class="form-card">
+        <form action="#" th:action="@{/savebook}" th:object="${book}" method="post" id="bookform">
+            <label for="titleInput">Title:</label>
+            <input type="text" id="titleInput" th:field="*{title}" placeholder="Book Title">
 
-    <label for="genreSelect">Genre:</label>
-    <select id="genreSelect" th:field="*{genre.genreId}">
-        <option value="">-- Select a Genre --</option>
-        <option th:each="genre : ${genreList}"
-                th:value="${genre.genreId}"
-                th:text="${genre.genreName}">
-        </option>
-    </select>
+            <label for="isbnInput">ISBN:</label>
+            <input type="text" id="isbnInput" th:field="*{isbn}" placeholder="Book ISBN" size="13">
 
-    <label for="authorSelect">Author:</label>
-    <select id="authorSelect" th:field="*{author.authorID}">
-        <option value="">-- Select an Author --</option>
-        <option th:each="author : ${authorList}"
-                th:value="${author.authorID}"
-                th:text="${author.firstname + ' ' + author.lastname}">
-        </option>
-    </select>
+            <label for="genreSelect">Genre:</label>
+            <select id="genreSelect" th:field="*{genre.genreId}">
+                <option value="">-- Select a Genre --</option>
+                <option th:each="genre : ${genreList}"
+                        th:value="${genre.genreId}"
+                        th:text="${genre.genreName}">
+                </option>
+            </select>
 
-    <button type="submit">Add Book</button>
-</form>
+            <label for="authorSelect">Author:</label>
+            <select id="authorSelect" th:field="*{author.authorID}">
+                <option value="">-- Select an Author --</option>
+                <option th:each="author : ${authorList}"
+                        th:value="${author.authorID}"
+                        th:text="${author.firstname + ' ' + author.lastname}">
+                </option>
+            </select>
 
+            <button type="submit" class="btn">Add Book</button>
+        </form>
+    </div>
+</div>
 </body>
 </html>

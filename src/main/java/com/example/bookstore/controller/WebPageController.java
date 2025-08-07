@@ -1,20 +1,18 @@
 package com.example.bookstore.controller;
 
 import com.example.bookstore.entity.*;
+import com.example.bookstore.security.CustomOAuth2User;
+import com.example.bookstore.service.*;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.ui.Model;
 
-import com.example.bookstore.service.BookService;
 import com.example.bookstore.entity.Customer;
-import com.example.bookstore.service.CustomerService;
-import com.example.bookstore.service.GenreService;
-import com.example.bookstore.service.AuthorService;
-import com.example.bookstore.service.OrderItemService;
-import com.example.bookstore.service.OrderService;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 
@@ -45,41 +43,56 @@ public class WebPageController {
     @Autowired
     private OrderItemService orderItemService;
 
+    private final CustomUserDetailService customUserDetailService;
 
+
+    public WebPageController(CustomUserDetailService customUserDetailService) {
+        this.customUserDetailService = customUserDetailService;
+    }
 
 
     @GetMapping("/")
-    public String homePage(@CookieValue(name="userId", required = false)String userId, Model model){
+    public String index(Model model) {
+        model.addAttribute("isLoggedIn", false); // or true, depending on logic
+        model.addAttribute("isAdmin", false);
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        Customer customer = null; // Initialize customer to null
+
+
+
+        if (authentication != null && authentication.isAuthenticated() && !(authentication.getPrincipal() instanceof String)) {
+            Object principal = authentication.getPrincipal();
+            System.out.println("DEBUG: Principal class is: " + principal.getClass().getName());
+
+            if (principal instanceof Customer) {
+                customer = (Customer) principal;
+                System.out.println("DEBUG: Customer from form login. Email: " + customer.getEmail() + ", Firstname: " + customer.getFirstname());
+                model.addAttribute("isLoggedIn", true);
+            } else if (principal instanceof CustomOAuth2User) {
+                customer = ((CustomOAuth2User) principal).getCustomer();
+                System.out.println("DEBUG: Customer from OAuth2 login. Email: " + customer.getEmail() + ", Firstname: " + customer.getFirstname());
+                model.addAttribute("isLoggedIn", true);
+
+            }
+
+            if (customer != null) {
+                model.addAttribute("customer", customer);
+                System.out.println("DEBUG: 'customer' object added to model in index method.");
+            } else {
+                System.out.println("DEBUG: 'customer' object is null after principal check in index method.");
+            }
+        } else {
+            System.out.println("DEBUG: Not authenticated or anonymous customer in index method.");
+        }
+
         model.addAttribute("listofbooks", bookService.fetchBookList());
-
-        Boolean isLoggedIn = (userId != null && !userId.isEmpty());
-        if(isLoggedIn){
-
-            Boolean userexists = customerService.checkForCustomerByUniqueId(userId);
-            Boolean isAdmin = customerService.checkForAdmin(userId);
-            model.addAttribute("isAdmin", isAdmin);
+        if(customerService.checkForAdmin(customer.getUniqueID())) {
+            model.addAttribute("isAdmin", true);
         }
-        else {
-            model.addAttribute("isAdmin", false);
-        }
-
-
-        model.addAttribute("isLoggedIn", isLoggedIn);
-
-
-
         return "index";
     }
 
-    @GetMapping("/secured-page")
-    public String securedPage(Model model, OAuth2AuthenticationToken authentication) {
-        // Retrieve user attributes from the OAuth2AuthenticationToken
-        var userAttributes = authentication.getPrincipal().getAttributes();
-        model.addAttribute("name", userAttributes.get("name"));
-        model.addAttribute("email", userAttributes.get("email"));
-
-        return "secured-page"; // This is a page only accessible to authenticated users
-    }
+    
 
 
     @GetMapping("/addBook")
@@ -102,24 +115,22 @@ public class WebPageController {
         return "redirect:/";
     }
 
-    @GetMapping ("/createaccount")
-    public String createAccount(Model model) {
+    @GetMapping("/register")
+    public String register(Model model) {
         Customer customer = new Customer();
         model.addAttribute("customer", customer);
-        return "createAccount";
+        return "register";
     }
 
-    @PostMapping("/savenewaccount")
-    public String saveNewAccount(@ModelAttribute("customer") Customer customer) {
-        customerService.saveCustomer(customer);
+    @PostMapping("/register")
+    public String saveRegister(@ModelAttribute("customer") Customer customer) {
+        customUserDetailService.registerUser(customer);
         return "redirect:/";
     }
 
     @GetMapping("/login")
-    public String loginForm(Model model){
-        Customer customer = new Customer();
-        model.addAttribute("customer", customer);
-        return "loginform";
+    public String login() {
+        return "login";
     }
 
     @PostMapping("/logincheck")
@@ -185,17 +196,77 @@ public class WebPageController {
     }
 
     @GetMapping("/useraccount")
-    public String userAccountSettings(@CookieValue(name="userId", required = true)String userId, Model model)
+    public String userAccountSettings(Model model)
     {
-        Customer customer = customerService.getCustomerByUniqueId(userId);
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        Customer customer = null; // Initialize customer to null
+
+        if (authentication != null && authentication.isAuthenticated() && !(authentication.getPrincipal() instanceof String)) {
+            Object principal = authentication.getPrincipal();
+            System.out.println("DEBUG: Principal class is: " + principal.getClass().getName());
+
+            if (principal instanceof Customer) {
+                customer = (Customer) principal;
+                System.out.println("DEBUG: Customer from form login. Email: " + customer.getEmail() + ", Firstname: " + customer.getFirstname());
+                model.addAttribute("isLoggedIn", true);
+
+            } else if (principal instanceof CustomOAuth2User) {
+                customer = ((CustomOAuth2User) principal).getCustomer();
+                System.out.println("DEBUG: Customer from OAuth2 login. Email: " + customer.getEmail() + ", Firstname: " + customer.getFirstname());
+                model.addAttribute("isLoggedIn", true);
+
+            }
+
+            if (customer != null) {
+                model.addAttribute("customer", customer);
+                System.out.println("DEBUG: 'customer' object added to model in index method.");
+            } else {
+                System.out.println("DEBUG: 'customer' object is null after principal check in index method.");
+            }
+        } else {
+            System.out.println("DEBUG: Not authenticated or anonymous customer in index method.");
+        }
         model.addAttribute("customer", customer);
         return "usersettings";
     }
 
     @PostMapping("/saveaccount/{param}")
-    public String updateAccount(@CookieValue(name="userId", required = true)String userId, @PathVariable String param, @RequestParam Map<String, String> formData)
+    public String updateAccount(@PathVariable String param, @RequestParam Map<String, String> formData, Model model)
     {
-        customerService.updateCustomer(param, userId, formData);
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        Customer customer = null; // Initialize customer to null
+
+        if (authentication != null && authentication.isAuthenticated() && !(authentication.getPrincipal() instanceof String)) {
+            Object principal = authentication.getPrincipal();
+            System.out.println("DEBUG: Principal class is: " + principal.getClass().getName());
+
+            if (principal instanceof Customer) {
+                customer = (Customer) principal;
+                System.out.println("DEBUG: Customer from form login. Email: " + customer.getEmail() + ", Firstname: " + customer.getFirstname());
+                model.addAttribute("isLoggedIn", true);
+
+            } else if (principal instanceof CustomOAuth2User) {
+                customer = ((CustomOAuth2User) principal).getCustomer();
+                System.out.println("DEBUG: Customer from OAuth2 login. Email: " + customer.getEmail() + ", Firstname: " + customer.getFirstname());
+                model.addAttribute("isLoggedIn", true);
+
+            }
+
+            if (customer != null) {
+                model.addAttribute("customer", customer);
+                System.out.println("DEBUG: 'customer' object added to model in index method.");
+            } else {
+                System.out.println("DEBUG: 'customer' object is null after principal check in index method.");
+            }
+        } else {
+            System.out.println("DEBUG: Not authenticated or anonymous customer in index method.");
+        }
+
+
+        assert customer != null;
+        System.out.println(customer.getUniqueID());
+        customerService.updateCustomer(param, customer.getUniqueID(), formData);
 
 
         return "redirect:/useraccount";
@@ -209,8 +280,39 @@ public class WebPageController {
 
 
     @GetMapping("/checkout")
-    public String showCart(@CookieValue(name = "shoppingCart", required = false) String shoppingCartCookie, Model model, @CookieValue(name="userId") String userId) {
+    public String showCart(@CookieValue(name = "shoppingCart", required = false) String shoppingCartCookie, Model model) {
         List cartBooks = Collections.emptyList();
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        Customer customer = null; // Initialize customer to null
+
+        if (authentication != null && authentication.isAuthenticated() && !(authentication.getPrincipal() instanceof String)) {
+            Object principal = authentication.getPrincipal();
+            System.out.println("DEBUG: Principal class is: " + principal.getClass().getName());
+
+            if (principal instanceof Customer) {
+                customer = (Customer) principal;
+                System.out.println("DEBUG: Customer from form login. Email: " + customer.getEmail() + ", Firstname: " + customer.getFirstname());
+                model.addAttribute("isLoggedIn", true);
+
+            } else if (principal instanceof CustomOAuth2User) {
+                customer = ((CustomOAuth2User) principal).getCustomer();
+                System.out.println("DEBUG: Customer from OAuth2 login. Email: " + customer.getEmail() + ", Firstname: " + customer.getFirstname());
+                model.addAttribute("isLoggedIn", true);
+
+            }
+
+            if (customer != null) {
+                model.addAttribute("customer", customer);
+                System.out.println("DEBUG: 'customer' object added to model in index method.");
+            } else {
+                System.out.println("DEBUG: 'customer' object is null after principal check in index method.");
+            }
+        } else {
+            System.out.println("DEBUG: Not authenticated or anonymous customer in index method.");
+        }
+
+
 
         if (shoppingCartCookie != null && !shoppingCartCookie.isEmpty()) {
             try {
@@ -239,31 +341,51 @@ public class WebPageController {
 
         model.addAttribute("cartBooks", cartBooks);
 
-        Customer customer = customerService.getCustomerByUniqueId(userId);
 
         model.addAttribute("customer", customer);
+
 
         return "checkout";
     }
 
 
     @PostMapping("/sendorder")
-    public String sendOrder(@CookieValue(name = "shoppingCart", required = true) String shoppingCartCookie, Model model, @CookieValue(name="userId", required = true) String userId) {
+    public String sendOrder(@CookieValue(name = "shoppingCart", required = true) String shoppingCartCookie, Model model) {
         List cartBooks = Collections.emptyList();
-        Customer customer = customerService.getCustomerByUniqueId(userId);
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        Customer customer = null; // Initialize customer to null
+
+        if (authentication != null && authentication.isAuthenticated() && !(authentication.getPrincipal() instanceof String)) {
+            Object principal = authentication.getPrincipal();
+            System.out.println("DEBUG: Principal class is: " + principal.getClass().getName());
+
+            if (principal instanceof Customer) {
+                customer = (Customer) principal;
+                System.out.println("DEBUG: Customer from form login. Email: " + customer.getEmail() + ", Firstname: " + customer.getFirstname());
+                model.addAttribute("isLoggedIn", true);
+
+            } else if (principal instanceof CustomOAuth2User) {
+                customer = ((CustomOAuth2User) principal).getCustomer();
+                System.out.println("DEBUG: Customer from OAuth2 login. Email: " + customer.getEmail() + ", Firstname: " + customer.getFirstname());
+                model.addAttribute("isLoggedIn", true);
+
+            }
+
+            if (customer != null) {
+                model.addAttribute("customer", customer);
+                System.out.println("DEBUG: 'customer' object added to model in index method.");
+            } else {
+                System.out.println("DEBUG: 'customer' object is null after principal check in index method.");
+            }
+        } else {
+            System.out.println("DEBUG: Not authenticated or anonymous customer in index method.");
+        }
 
         List<OrderItem> orderItemList = new ArrayList<>();
 
         Order order = Order.builder().customer(customer).build();
         if (shoppingCartCookie != null && !shoppingCartCookie.isEmpty()) {
             try {
-
-
-
-
-
-
-
 
 
 
@@ -305,9 +427,36 @@ public class WebPageController {
 
 
     @GetMapping("/myorders")
-    public String myOrders(@CookieValue(value = "userId", required = true)String userId, Model model)
+    public String myOrders(Model model)
     {
-        Customer customer = customerService.getCustomerByUniqueId(userId);
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        Customer customer = null; // Initialize customer to null
+
+        if (authentication != null && authentication.isAuthenticated() && !(authentication.getPrincipal() instanceof String)) {
+            Object principal = authentication.getPrincipal();
+            System.out.println("DEBUG: Principal class is: " + principal.getClass().getName());
+
+            if (principal instanceof Customer) {
+                customer = (Customer) principal;
+                System.out.println("DEBUG: Customer from form login. Email: " + customer.getEmail() + ", Firstname: " + customer.getFirstname());
+                model.addAttribute("isLoggedIn", true);
+
+            } else if (principal instanceof CustomOAuth2User) {
+                customer = ((CustomOAuth2User) principal).getCustomer();
+                System.out.println("DEBUG: Customer from OAuth2 login. Email: " + customer.getEmail() + ", Firstname: " + customer.getFirstname());
+                model.addAttribute("isLoggedIn", true);
+
+            }
+
+            if (customer != null) {
+                model.addAttribute("customer", customer);
+                System.out.println("DEBUG: 'customer' object added to model in index method.");
+            } else {
+                System.out.println("DEBUG: 'customer' object is null after principal check in index method.");
+            }
+        } else {
+            System.out.println("DEBUG: Not authenticated or anonymous customer in index method.");
+        }
         List<Order> orders = orderService.fetchCustomerOrders(customer);
 
         model.addAttribute("listoforders", orders);
@@ -315,8 +464,40 @@ public class WebPageController {
     }
 
     @GetMapping("/allorders")
-    public String allOrders(@CookieValue(value ="userId")String userId, Model model){
-        if(customerService.checkForAdmin(userId)){
+    public String allOrders(Model model){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        Customer customer = null; // Initialize customer to null
+
+        if (authentication != null && authentication.isAuthenticated() && !(authentication.getPrincipal() instanceof String)) {
+            Object principal = authentication.getPrincipal();
+            System.out.println("DEBUG: Principal class is: " + principal.getClass().getName());
+
+            if (principal instanceof Customer) {
+                customer = (Customer) principal;
+                System.out.println("DEBUG: Customer from form login. Email: " + customer.getEmail() + ", Firstname: " + customer.getFirstname());
+                model.addAttribute("isLoggedIn", true);
+
+            } else if (principal instanceof CustomOAuth2User) {
+                customer = ((CustomOAuth2User) principal).getCustomer();
+                System.out.println("DEBUG: Customer from OAuth2 login. Email: " + customer.getEmail() + ", Firstname: " + customer.getFirstname());
+                model.addAttribute("isLoggedIn", true);
+
+            }
+
+            if (customer != null) {
+                model.addAttribute("customer", customer);
+                System.out.println("DEBUG: 'customer' object added to model in index method.");
+            } else {
+                System.out.println("DEBUG: 'customer' object is null after principal check in index method.");
+            }
+        } else {
+            System.out.println("DEBUG: Not authenticated or anonymous customer in index method.");
+        }
+
+
+
+
+        if(customerService.checkForAdmin(customer.getUniqueID())){
             List<Order> orders = orderService.fetchOrderList();
             model.addAttribute("listoforders", orders);
             return "/allorders";

@@ -2,147 +2,240 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Bookstore - Account</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bookstore - Account Settings</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
+        :root {
+            --primary-color: #5d5dff;
+            --primary-dark: #4b4bb2;
+            --secondary-color: #f0f4f8;
+            --text-color: #2c3e50;
+            --card-background: #ffffff;
+            --border-color: #e0e6ed;
+            --shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+            --transition: all 0.2s ease-in-out;
+        }
+
         body {
-            font-family: sans-serif;
-            margin: 20px;
-            background-color: #f8f9fa;
-            color: #343a40;
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            background-color: var(--secondary-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            padding: 20px;
         }
-        h2 {
-            text-align: center;
-            color: #007bff;
-            margin-bottom: 25px;
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
         }
-        table {
-            width: 80%;
-            margin: 20px auto;
-            border-collapse: collapse;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-            background-color: #fff;
-            border-radius: 8px;
-            overflow: hidden; /* Ensures rounded corners apply to table content */
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+            padding: 20px;
+            background-color: var(--card-background);
+            border-radius: 12px;
+            box-shadow: var(--shadow);
         }
-        th, td {
-            padding: 12px 15px;
-            text-align: left;
-            border-bottom: 1px solid #dee2e6;
+
+        .header h2 {
+            margin: 0;
+            font-size: 2rem;
+            color: var(--primary-color);
+            font-weight: 700;
         }
-        th {
-            background-color: #007bff;
-            color: white;
-            font-weight: bold;
-        }
-        tr:nth-child(even) {
-            background-color: #f2f2f2;
-        }
-        tr:hover {
-            background-color: #e9ecef;
-        }
-        .add-book-container {
-            text-align: center;
-            margin-top: 30px;
-        }
+
         .btn {
-            display: inline-block;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
             padding: 10px 20px;
-            font-size: 16px;
-            font-weight: bold;
+            font-size: 1rem;
+            font-weight: 500;
             text-align: center;
             text-decoration: none;
-            border-radius: 5px;
+            border-radius: 8px;
             cursor: pointer;
-            transition: background-color 0.3s ease;
+            transition: var(--transition);
+            border: 2px solid var(--primary-color);
+            background-color: var(--primary-color);
+            color: var(--card-background);
         }
-        .btn-primary {
-            background-color: #007bff;
-            color: white;
-            border: 1px solid #007bff;
-        }
-        .btn-primary:hover {
-            background-color: #0056b3;
-            border-color: #0056b3;
-        }
-        form { background-color: #f4f4f4; padding: 20px; border-radius: 8px; max-width: 400px; margin: auto; }
-      label { display: block; margin-bottom: 5px; font-weight: bold; }
-        input[type="text"] { width: calc(100% - 22px); padding: 10px; margin-bottom: 15px; border: 1px solid #ddd; border-radius: 4px; }
-        input[type="password"] { width: calc(100% - 22px); padding: 10px; margin-bottom: 15px; border: 1px solid #ddd; border-radius: 4px; }
-      button { background-color: #007bff; color: white; padding: 10px 15px; border: none; border-radius: 4px; cursor: pointer; font-size: 16px; }
-        button:hover { background-color: #0056b3; }
 
+        .btn:hover {
+            background-color: var(--primary-dark);
+            border-color: var(--primary-dark);
+            transform: translateY(-1px);
+        }
+
+        .btn-secondary {
+            background-color: transparent;
+            color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+
+        .btn-secondary:hover {
+            background-color: var(--primary-color);
+            color: var(--card-background);
+        }
+
+        .info-card {
+            background-color: var(--card-background);
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+            padding: 20px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .info-item {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .info-item label {
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: #607d8b;
+        }
+
+        .info-item p {
+            margin: 0;
+            font-size: 1rem;
+            color: var(--text-color);
+            word-wrap: break-word;
+        }
+
+        .form-card {
+            background-color: var(--card-background);
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        label {
+            display: block;
+            font-weight: 500;
+            margin-bottom: 5px;
+        }
+
+        input[type="text"], input[type="password"] {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            box-sizing: border-box;
+            transition: var(--transition);
+        }
+
+        input[type="text"]:focus, input[type="password"]:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 2px rgba(93, 93, 255, 0.2);
+        }
+
+        .form-section {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
     </style>
 </head>
 <body>
 
-<h2 style="text-align: center;">Your Account</h2>
+<div class="container">
+    <div class="header">
+        <h2>Your Account</h2>
+        <a th:href="@{/}" class="btn">Go Back</a>
+    </div>
 
-<a th:href="@{/}" class="btn btn-primary">Go Back</a>
+    <div class="info-card">
+        <div class="info-item">
+            <label>First Name</label>
+            <p th:text="${customer.firstname}"></p>
+        </div>
+        <div class="info-item">
+            <label>Last Name</label>
+            <p th:text="${customer.lastname}"></p>
+        </div>
+        <div class="info-item">
+            <label>Email</label>
+            <p th:text="${customer.email}"></p>
+        </div>
+        <div class="info-item">
+            <label>Password (Encrypted)</label>
+            <p th:text="${customer.password}"></p>
+        </div>
+        <div class="info-item">
+            <label>Address</label>
+            <p th:text="${customer.address}"></p>
+        </div>
+    </div>
 
-<table>
-    <thead>
-    <tr>
-        <th>First Name</th>
-        <th>Last Name</th>
-        <th>Email</th>
-        <th>Password (Encrypted)</th>
-        <th>Address</th>
-    </tr>
-    </thead>
-    <tbody>
-    <tr>
-        <td th:text="${customer.firstname}"></td>
-        <td th:text="${customer.lastname}"></td>
-        <td th:text="${customer.email}"></td>
-        <td th:text="${customer.password}"></td>
-        <td th:text="${customer.address}"></td>
-    </tr>
-    </tbody>
-</table>
+    <div class="form-card">
+        <form action="#" method="post" th:action="@{/saveaccount/name}" th:object="${customer}">
+            <div class="form-section">
+                <div>
+                    <label for="firstname">First Name</label>
+                    <input id="firstname" placeholder="*{firstname}" th:field="*{firstname}" type="text">
+                </div>
+                <div>
+                    <label for="lastname">Last Name</label>
+                    <input id="lastname" placeholder="*{lastname}" th:field="*{lastname}" type="text">
+                </div>
+            </div>
+            <button type="submit" class="btn">Change Name</button>
+        </form>
+    </div>
 
-<form action="#" method="post" th:action="@{/saveaccount/name}" th:object="${customer}">
-    <label for="firstname">Firstname</label>
-    <input id="firstname" placeholder="*{firstname}" th:field="*{firstname}" type="text">
-    <br>
+    <div class="form-card">
+        <form action="#" method="post" th:action="@{/saveaccount/email}" th:object="${customer}">
+            <label for="email">Email</label>
+            <input id="email" placeholder="*{emailname}" th:field="*{email}" type="text">
+            <button type="submit" class="btn">Change Email</button>
+        </form>
+    </div>
 
-    <label for="lastname">Last Name</label>
-    <input id="lastname" placeholder="*{lastname}" th:field="*{lastname}" type="text">
-    <br>
-    <button type="submit">Change Name</button>
+    <div class="form-card">
+        <form action="#" method="post" th:action="@{/saveaccount/password}" th:object="${customer}">
+            <label for="password">Password</label>
+            <input id="password" placeholder=" " th:field="*{password}" type="password">
+            <button type="submit" class="btn">Change Password</button>
+        </form>
+    </div>
 
-</form>
+    <div class="form-card">
+        <form action="#" method="post" th:action="@{/saveaccount/address}" th:object="${customer}">
+            <label for="address">Address:</label>
+            <input id="address" placeholder="Address" th:field="*{address}" type="text">
+            <button type="submit" class="btn">Change Address</button>
+        </form>
+    </div>
 
-<form action="#" method="post" th:action="@{/saveaccount/email}" th:object="${customer}">
-    <label for="email">Email</label>
-    <input id="email" placeholder="*{emailname}" th:field="*{email}" type="text">
-    <button type="submit">Change Email</button>
-</form>
-
-<form action="#" method="post" th:action="@{/saveaccount/password}" th:object="${customer}">
-    <label for="password">Password</label>
-    <input id="password" placeholder=" " th:field="*{password}" type="password">
-
-
-    <button type="submit">Change Password</button>
-</form>
-
-<form action="#" method="post" th:action="@{/saveaccount/address}" th:object="${customer}">
-    <label for="address">Address:</label>
-    <input id="address" placeholder="Address" th:field="*{address}" type="text">
-    <br>
-
-    <button type="submit">Change Address</button>
-</form>
-
-
-<div class="add-book-container">
-
-
-    <form action="#" method="post" th:action="@{/logout}" th:if="${isLoggedIn}">
-        <button class="btn btn-primary" type="submit">Logout</button>
-    </form>
+    <div style="text-align: center;">
+        <form action="#" method="post" th:action="@{/logout}" th:if="${isLoggedIn}">
+            <button class="btn btn-secondary" type="submit">Logout</button>
+        </form>
+    </div>
 </div>
-
 
 </body>
 </html>
