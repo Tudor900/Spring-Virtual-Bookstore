@@ -6,6 +6,7 @@ import com.example.bookstore.service.*;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
@@ -231,44 +232,32 @@ public class WebPageController {
     }
 
     @PostMapping("/saveaccount/{param}")
-    public String updateAccount(@PathVariable String param, @RequestParam Map<String, String> formData, Model model)
-    {
-
+    public String updateAccount(@PathVariable String param, @RequestParam Map<String, String> formData, HttpServletResponse response) {
+        // Get the current customer from the security context
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        Customer customer = null; // Initialize customer to null
+        Customer currentCustomer = null;
 
-        if (authentication != null && authentication.isAuthenticated() && !(authentication.getPrincipal() instanceof String)) {
-            Object principal = authentication.getPrincipal();
-            System.out.println("DEBUG: Principal class is: " + principal.getClass().getName());
-
-            if (principal instanceof Customer) {
-                customer = (Customer) principal;
-                System.out.println("DEBUG: Customer from form login. Email: " + customer.getEmail() + ", Firstname: " + customer.getFirstname());
-                model.addAttribute("isLoggedIn", true);
-
-            } else if (principal instanceof CustomOAuth2User) {
-                customer = ((CustomOAuth2User) principal).getCustomer();
-                System.out.println("DEBUG: Customer from OAuth2 login. Email: " + customer.getEmail() + ", Firstname: " + customer.getFirstname());
-                model.addAttribute("isLoggedIn", true);
-
-            }
-
-            if (customer != null) {
-                model.addAttribute("customer", customer);
-                System.out.println("DEBUG: 'customer' object added to model in index method.");
-            } else {
-                System.out.println("DEBUG: 'customer' object is null after principal check in index method.");
-            }
-        } else {
-            System.out.println("DEBUG: Not authenticated or anonymous customer in index method.");
+        if (authentication != null && authentication.getPrincipal() instanceof CustomOAuth2User) {
+            currentCustomer = ((CustomOAuth2User) authentication.getPrincipal()).getCustomer();
+        } else if (authentication != null && authentication.getPrincipal() instanceof Customer) {
+            currentCustomer = (Customer) authentication.getPrincipal();
         }
 
+        if (currentCustomer != null) {
+            // Update the customer in the database
+            customerService.updateCustomer(param, currentCustomer.getUniqueID(), formData);
 
-        assert customer != null;
-        System.out.println(customer.getUniqueID());
-        customerService.updateCustomer(param, customer.getUniqueID(), formData);
+            // After the update, reload the customer and update the security context
+            Customer updatedCustomer = customerService.getCustomerByUniqueId(currentCustomer.getUniqueID());
+            Authentication newAuthentication = new UsernamePasswordAuthenticationToken(
+                    updatedCustomer,
+                    authentication.getCredentials(),
+                    authentication.getAuthorities()
+            );
+            SecurityContextHolder.getContext().setAuthentication(newAuthentication);
+        }
 
-
+        // Redirect back to the user account page to show the updated information
         return "redirect:/useraccount";
     }
 

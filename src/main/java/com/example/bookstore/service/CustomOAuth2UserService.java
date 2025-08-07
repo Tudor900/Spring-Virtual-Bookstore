@@ -40,7 +40,7 @@ public class CustomOAuth2UserService extends OidcUserService {
             customer = existingUser.get();
             customer.setFirstname(firstName);
             customer.setLastname(lastName);
-            customerRepository.save(customer);
+
         } else {
             customer = new Customer(firstName, lastName, email);
             customer.setPassword("[google login]");// Still set a dummy password if required by DB
