@@ -10,6 +10,8 @@ import java.security.MessageDigest;
 import java.security.SecureRandom;
 import java.util.List;
 import java.util.Objects;
+
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -24,6 +26,12 @@ public class AuthorServiceImplementation implements AuthorService{
     public Author saveAuthor(Author author){
         return authorRepository.save(author);
     }
+
+    public Author findAuthor(Long authorid){
+        return authorRepository.findById(authorid).orElseThrow(() -> new EntityNotFoundException("Author not found"));
+    }
+
+
 
     @Override
     public List<Author> fetchAuthorList()

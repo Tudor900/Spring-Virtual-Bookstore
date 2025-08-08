@@ -4,31 +4,28 @@ import com.example.bookstore.entity.*;
 import com.example.bookstore.security.CustomOAuth2User;
 import com.example.bookstore.service.*;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.*;
 import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.*;
 
-import com.example.bookstore.entity.Customer;
-import jakarta.servlet.http.Cookie;
-import jakarta.servlet.http.HttpServletResponse;
-
-
-import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
-
-
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import static java.lang.Long.valueOf;
 
 
 @Controller
-
+@CrossOrigin(origins = "http://localhost:5173")
 public class WebPageController {
 
     @Autowired
@@ -53,43 +50,65 @@ public class WebPageController {
 
 
     @GetMapping("/")
-    public String index(Model model) {
-        model.addAttribute("isLoggedIn", false); // or true, depending on logic
+    public String index(Model model, @RequestParam(name="genreId", required = false) Long genreId, @RequestParam(name="authorId", required = false) Long authorId) {
+        model.addAttribute("isLoggedIn", false);
         model.addAttribute("isAdmin", false);
+
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        Customer customer = null; // Initialize customer to null
-
-
+        Customer customer = null;
 
         if (authentication != null && authentication.isAuthenticated() && !(authentication.getPrincipal() instanceof String)) {
             Object principal = authentication.getPrincipal();
-            System.out.println("DEBUG: Principal class is: " + principal.getClass().getName());
 
             if (principal instanceof Customer) {
                 customer = (Customer) principal;
-                System.out.println("DEBUG: Customer from form login. Email: " + customer.getEmail() + ", Firstname: " + customer.getFirstname());
                 model.addAttribute("isLoggedIn", true);
             } else if (principal instanceof CustomOAuth2User) {
                 customer = ((CustomOAuth2User) principal).getCustomer();
-                System.out.println("DEBUG: Customer from OAuth2 login. Email: " + customer.getEmail() + ", Firstname: " + customer.getFirstname());
                 model.addAttribute("isLoggedIn", true);
-
             }
 
             if (customer != null) {
                 model.addAttribute("customer", customer);
-                System.out.println("DEBUG: 'customer' object added to model in index method.");
-            } else {
-                System.out.println("DEBUG: 'customer' object is null after principal check in index method.");
+                if (customerService.checkForAdmin(customer.getUniqueID())) {
+                    model.addAttribute("isAdmin", true);
+                }
             }
-        } else {
-            System.out.println("DEBUG: Not authenticated or anonymous customer in index method.");
         }
 
-        model.addAttribute("listofbooks", bookService.fetchBookList());
-        if(customerService.checkForAdmin(customer.getUniqueID())) {
-            model.addAttribute("isAdmin", true);
+        // Initialize listofbooks with all books first, then filter
+        if (genreId != null && authorId == null) {
+            model.addAttribute("listofbooks", bookService.findByGenre(genreId));
+        } else if (genreId == null && authorId != null) {
+            model.addAttribute("listofbooks", bookService.findByAuthor(authorId));
+        } else if (genreId != null && authorId != null) {
+            model.addAttribute("listofbooks", bookService.findByAuthorAndGenre(genreId, authorId));
+        } else {
+            model.addAttribute("listofbooks", bookService.fetchBookList());
         }
+
+        // --- NEW LOGIC FOR DISPLAYING ACTIVE FILTERS ---
+        // Pass the full objects to the model for Thymeleaf to access their properties
+        if (genreId != null) {
+            // Find the full Genre object and add it to the model
+            Genre activeGenreObject = genreService.findGenre(genreId);
+            if (activeGenreObject != null) {
+                model.addAttribute("activeGenre", activeGenreObject);
+            }
+        }
+
+        if (authorId != null) {
+            // Find the full Author object and add it to the model
+            Author activeAuthorObject = authorService.findAuthor(authorId);
+            if (activeAuthorObject != null) {
+                model.addAttribute("activeAuthor", activeAuthorObject);
+            }
+        }
+
+        // Add genre and author lists to the model for the dropdowns
+        model.addAttribute("genreList", genreService.fetchGenreList());
+        model.addAttribute("authorList", authorService.fetchAuthorList());
+
         return "index";
     }
 
@@ -404,14 +423,54 @@ public class WebPageController {
         }
 
 
+
         orderService.saveOrder(order);
 
 
 
 
-        return "redirect:/checkout";
+        return "redirect:/orderSuccess";
     }
 
+    @GetMapping("/orderSuccess")
+    public String orderSuccess(Model model  ){
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        Customer customer = null; // Initialize customer to null
+
+        if (authentication != null && authentication.isAuthenticated() && !(authentication.getPrincipal() instanceof String)) {
+            Object principal = authentication.getPrincipal();
+            System.out.println("DEBUG: Principal class is: " + principal.getClass().getName());
+
+            if (principal instanceof Customer) {
+                customer = (Customer) principal;
+                System.out.println("DEBUG: Customer from form login. Email: " + customer.getEmail() + ", Firstname: " + customer.getFirstname());
+                model.addAttribute("isLoggedIn", true);
+
+            } else if (principal instanceof CustomOAuth2User) {
+                customer = ((CustomOAuth2User) principal).getCustomer();
+                System.out.println("DEBUG: Customer from OAuth2 login. Email: " + customer.getEmail() + ", Firstname: " + customer.getFirstname());
+                model.addAttribute("isLoggedIn", true);
+
+            }
+
+            if (customer != null) {
+                model.addAttribute("customer", customer);
+                System.out.println("DEBUG: 'customer' object added to model in index method.");
+            } else {
+                System.out.println("DEBUG: 'customer' object is null after principal check in index method.");
+            }
+        } else {
+            System.out.println("DEBUG: Not authenticated or anonymous customer in index method.");
+        }
+
+        Order order = orderService.returnLatestOrder(customer);
+
+        model.addAttribute("order", order);
+
+
+        return "orderSuccess";
+    }
 
 
 

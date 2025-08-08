@@ -1,5 +1,6 @@
 package com.example.bookstore.service;
 
+import com.example.bookstore.entity.Author;
 import com.example.bookstore.entity.Genre;
 import com.example.bookstore.repository.GenreRepository;
 
@@ -9,6 +10,8 @@ import java.security.MessageDigest;
 import java.security.SecureRandom;
 import java.util.List;
 import java.util.Objects;
+
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -22,6 +25,10 @@ public class GenreServiceImplementation implements GenreService{
     @Override
     public Genre saveGenre(Genre genre){
         return genreRepository.save(genre);
+    }
+
+    public Genre findGenre(Long genreid){
+        return genreRepository.findById(genreid).orElseThrow(() -> new EntityNotFoundException("Genre not found"));
     }
 
     @Override

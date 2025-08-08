@@ -43,5 +43,11 @@ public class OrderServiceImplementation implements OrderService{
         orderRepository.deleteById(orderID);
     }
 
+    public Order returnLatestOrder(Customer customer){
+
+        return orderRepository.findFirstByCustomerOrderByOrderIDDesc(customer);
+
+
+    }
 
 }

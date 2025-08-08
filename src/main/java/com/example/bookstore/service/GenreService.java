@@ -12,4 +12,5 @@ public interface GenreService {
     Genre updateGenre(Genre genre, Long genreID);
 
     void deleteGenreById(Long genreID);
+    Genre findGenre(Long genreid);
 }

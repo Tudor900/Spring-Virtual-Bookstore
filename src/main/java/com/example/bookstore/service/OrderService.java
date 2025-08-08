@@ -14,4 +14,5 @@ public interface OrderService {
     void deleteOrderById(Long orderID);
 
     List<Order> fetchCustomerOrders(Customer customer);
+    Order returnLatestOrder(Customer customer);
 }

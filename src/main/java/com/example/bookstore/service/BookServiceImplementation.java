@@ -86,5 +86,23 @@ public class BookServiceImplementation implements BookService{
         return bookRepository.findById(id).orElseThrow(() -> new EntityNotFoundException("Genre not found"));
     }
 
+    public List<Book> findByGenre(Long genreid){
+
+        Genre genre = genreRepository.findById(genreid).orElseThrow(() -> new EntityNotFoundException("Genre not found"));
+        return bookRepository.findByGenre(genre);
+    }
+
+    public List<Book> findByAuthor(Long authorid){
+        Author author = authorRepository.findById(authorid).orElseThrow(() -> new EntityNotFoundException("Author not found"));
+        return bookRepository.findByAuthor(author);
+    }
+
+    public List<Book> findByAuthorAndGenre(Long genreid, Long authorid){
+        Genre genre = genreRepository.findById(genreid).orElseThrow(() -> new EntityNotFoundException("Genre not found"));
+        Author author = authorRepository.findById(authorid).orElseThrow(() -> new EntityNotFoundException("Author not found"));
+        return bookRepository.findByGenreAndAuthor(genre, author);
+    }
+
+
 
 }

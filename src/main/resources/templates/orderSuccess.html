@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Order Confirmed!</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+        --primary-color: #5d5dff;
+        --secondary-color: #f0f4f8;
+        --text-color: #2c3e50;
+        --success-color: #4CAF50;
+        --card-background: #ffffff;
+        --shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+        --transition: all 0.2s ease-in-out;
+    }
+
+    body {
+        font-family: 'Roboto', sans-serif;
+        margin: 0;
+        background-color: var(--secondary-color);
+        color: var(--text-color);
+        line-height: 1.6;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+        text-align: center;
+        padding: 20px;
+    }
+
+    .success-container {
+        max-width: 600px;
+        background-color: var(--card-background);
+        padding: 40px;
+        border-radius: 12px;
+        box-shadow: var(--shadow);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 20px;
+    }
+
+    .success-icon {
+        font-size: 4rem;
+        color: var(--success-color);
+    }
+
+    .success-container h1 {
+        margin: 0;
+        font-size: 2rem;
+        color: var(--success-color);
+    }
+
+    .success-container p {
+        margin: 0;
+        font-size: 1rem;
+    }
+
+    .order-summary {
+        width: 100%;
+        background-color: var(--secondary-color);
+        border-radius: 8px;
+        padding: 20px;
+        margin-top: 10px;
+        text-align: left;
+    }
+
+    .order-summary h2 {
+        margin: 0 0 15px 0;
+        font-size: 1.25rem;
+        color: var(--text-color);
+        border-bottom: 1px solid var(--border-color);
+        padding-bottom: 10px;
+    }
+
+    .order-summary table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 0.9rem;
+    }
+
+    .order-summary th,
+    .order-summary td {
+        padding: 10px 0;
+        border-bottom: 1px solid #e0e6ed;
+    }
+
+    .order-summary th:first-child,
+    .order-summary td:first-child {
+        padding-left: 0;
+    }
+
+    .order-summary th {
+        text-align: left;
+        font-weight: 500;
+        color: #607d8b;
+    }
+
+    .order-summary .order-total {
+        font-weight: 700;
+        font-size: 1.1rem;
+        color: var(--text-color);
+        text-align: right;
+    }
+
+    .btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 12px 24px;
+        font-size: 1rem;
+        font-weight: 700;
+        text-align: center;
+        text-decoration: none;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: var(--transition);
+        background-color: var(--primary-color);
+        color: var(--card-background);
+        border: 2px solid var(--primary-color);
+    }
+
+    .btn:hover {
+        background-color: var(--primary-color);
+        opacity: 0.9;
+        transform: translateY(-1px);
+    }
+  </style>
+</head>
+<body>
+
+<div class="success-container">
+  <div class="success-icon">&#10003;</div>
+  <h1>Order Placed Successfully!</h1>
+  <p>Thank you for your purchase. A confirmation email has been sent to your inbox with the details of your order.</p>
+
+  <!-- Order Details Section -->
+  <div class="order-summary">
+    <h2>Order Summary</h2>
+    <p th:if="${order}" class="order-id">
+      <strong>Order ID:</strong> <span th:text="${order.orderID}"></span>
+    </p>
+    <table>
+      <thead>
+      <tr>
+        <th>Title</th>
+        <th>Author</th>
+        <th>Quantity</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr th:each="item : ${order.orderItems}">
+        <td th:text="${item.book.title}">The Hitchhiker's Guide to the Galaxy</td>
+        <td th:text="${item.book.author.firstname + ' ' + item.book.author.lastname}">Douglas Adams</td>
+        <td th:text="${item.quantity}">1</td>
+      </tr>
+      </tbody>
+    </table>
+    <div class="order-total">
+      <strong>Total:</strong> <span >$99.99</span>
+    </div>
+  </div>
+
+  <a th:href="@{/}" class="btn">Continue Shopping</a>
+</div>
+
+</body>
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+      // Function to delete a cookie by setting its expiration date to the past
+      function deleteCookie(name) {
+          document.cookie = name + '=; expires=Thu, 01 Jan 1970 00:00:01 GMT; path=/;';
+      }
+
+      // Delete the shoppingCart cookie when the page loads
+      deleteCookie('shoppingCart');
+  });
+</script>
+</html>

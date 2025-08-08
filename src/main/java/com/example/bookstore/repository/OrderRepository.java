@@ -13,4 +13,6 @@ import java.util.Optional;
 public interface OrderRepository extends CrudRepository<Order,Long> {
     List<Order> findByCustomer(Customer customer);
 
+    Order findFirstByCustomerOrderByOrderIDDesc(Customer customer);
+
 }
